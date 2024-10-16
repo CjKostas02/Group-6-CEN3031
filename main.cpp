@@ -9,7 +9,7 @@
 
 int main(){
     Application campusCentralApplication;
-    campusCentralApplication.run();
+    campusCentralApplication.runLogin();
 
     return 0;
 }

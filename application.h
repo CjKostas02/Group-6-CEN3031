@@ -1,26 +1,54 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <map>
+#include <vector>
+
+class Button{
+private:
+    // variables
+    std::string buttonText;
+    sf::Text buttonRenderText;
+    sf::RectangleShape hitBox;
+
+public:
+    // setter function prototypes
+    void setPosition(float x, float y);
+    void setHitbox(sf::RectangleShape inputHitbox);
+
+    // getter function prototypes
+    std::string getText();
+    sf::Text getRenderText();
+    sf::RectangleShape getHitbox();
+
+    // constructor
+    Button(sf::Text inputText);
+};
+
 
 class TextBox{
 private:
-    // text variable and rectangle object
-    std::string boxText = "";
+    // variables
+    std::string boxText;
+    sf::Text boxRenderText;
     sf::RectangleShape rect;
 
 public:
     // button selected boolean
     bool selected = false;
 
-    // setter
+    // setter function prototypes
     void setPosition(float x, float y);
     void setColor(sf::Color color);
+    void addChar(char character);
+    void backspace();
 
-    // getter
+    // getter function prototypes
+    sf::Text getRenderText();
+    std::string getText();
     sf::RectangleShape getRect();
 
-    // default constructor
-    TextBox();
+    // constructor
+    TextBox(sf::Text inputRenderText);
 };
 
 
@@ -33,21 +61,21 @@ private:
     // application state: 0 for login screen, 1 for main application, 2 for create account
     int applicationState = 0;
     sf::RenderWindow* window;
-    std::map<std::string, sf::Sprite>* textures;
-    std::map<std::string, TextBox*> textBoxes;
+    std::map<std::string, std::map<std::string, Button*>> buttons;
+    std::map<std::string, std::map<std::string, TextBox*>> textBoxes;
+
+    std::vector<char> characters;
 
 public:
-    // main driver prototype
-    void run();
+    // window driver prototypes
+    void runLogin();
+    void runCreateAcc();
 
-    // helper function prototypes for updating loginWindow
+    // function prototypes for updating loginWindow
     void renderLoginWindow();
+    void renderCreateAccWindow();
     void loadItems();
 
-    // default constructor
+    // constructor
     Application();
 };
-
-
-
-
