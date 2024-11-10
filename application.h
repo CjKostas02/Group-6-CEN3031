@@ -20,7 +20,6 @@ private:
 
 public:
     // setter function prototypes
-    void setPosition(float x, float y);
     void setHitbox(sf::RectangleShape inputHitbox);
 
     // getter function prototypes
@@ -32,6 +31,16 @@ public:
     Button(sf::Text inputText);
 };
 
+struct Listing{
+    float price;
+    std::string name;
+    std::string owner;
+    std::string description;
+    std::vector<Button> buttons;
+    sf::RectangleShape background;
+
+    Listing(const std::string& name, const float& price, const std::string& description, const std::string& currentUser);
+};
 
 class TextBox{
 private:
@@ -59,7 +68,7 @@ public:
     sf::RectangleShape getRect();
 
     // constructor
-    TextBox(sf::Text inputRenderText, const std::string& type);
+    TextBox(sf::Text& inputRenderText, const std::string& type, const float& width = 250);
 };
 
 
@@ -86,14 +95,12 @@ public:
     mongocxx::instance inst{};
 
     // window driver prototypes
-    void runLogin();
-    void runOrdering();
-    void runCreateAcc();
-    void runMyAccount();
+    void run();
     void changePassword();
     void changeUsername();
     void verifyLogin(const std::string& username, const std::string& password);
     bool createAccount(const std::string& username, const std::string& password);
+    void createListing(const std::string& name, const float& price, const std::string& description);
 
     // function prototypes
     void loadItems();
@@ -101,6 +108,7 @@ public:
     void renderOrderWindow();
     void renderMyAccountWindow();
     void renderCreateAccWindow();
+    void renderCreateListingWindow();
     void interpretKey(sf::Keyboard::Key keyCode);
 
     // constructor

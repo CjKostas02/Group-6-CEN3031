@@ -92,7 +92,7 @@ void Application::loadItems(){
     loginText.setFont(textFont);
     loginText.setFillColor({223, 226, 255});
     loginText.setCharacterSize(20);
-    loginText.setString("Log in");
+    loginText.setString("Log In");
     loginText.setPosition(495, 500);
 
     // log in button clickable area
@@ -155,6 +155,7 @@ void Application::loadItems(){
     backButton = new Button(backText);
     backButton->setHitbox(backHitbox);
     buttons["MyAccount"]["Back"] = backButton;
+    buttons["CreateListing"]["Back"] = backButton;
 
     // text object for my-account button
     sf::Text viewAccText;
@@ -283,9 +284,93 @@ void Application::loadItems(){
 
     // load into map for easy access
     buttons["MyAccount"]["ChangeUsername"] = changeUserButton;
+    
+    // text object for listing creation button
+    sf::Text createListingText;
+    createListingText.setFont(headerFont);
+    createListingText.setFillColor({223, 226, 255});
+    createListingText.setCharacterSize(30);
+    createListingText.setString("+");
+    createListingText.setPosition(989, 528);
+
+    // create listing button clickable area
+    sf::RectangleShape createListingHitbox({35,35});
+    createListingHitbox.setPosition(980,530);
+    createListingHitbox.setFillColor({98,115,255});
+
+    // create listing button object
+    Button* createListingButton = new Button(createListingText);
+    createListingButton->setHitbox(createListingHitbox);
+
+    // load into map for easy access
+    buttons["Ordering"]["CreateListing"] = createListingButton;
+
+    // text object for confirming listing button
+    sf::Text confirmListingText;
+    confirmListingText.setFont(textFont);
+    confirmListingText.setFillColor({223, 226, 255});
+    confirmListingText.setCharacterSize(20);
+    confirmListingText.setString("Create Listing");
+    confirmListingText.setPosition(820, 530);
+
+    // confirming listing button clickable area
+    sf::RectangleShape confirmListingHitbox({250,28});
+    confirmListingHitbox.setPosition(760,530);
+    confirmListingHitbox.setFillColor({98,115,255});
+
+    // confirming listing button object
+    Button* confirmListingButton = new Button(confirmListingText);
+    confirmListingButton->setHitbox(confirmListingHitbox);
+
+    // load into map for easy access
+    buttons["CreateListing"]["ConfirmListing"] = confirmListingButton;
+
+    // text object for listing name textbox
+    sf::Text listingNameText;
+    listingNameText.setFont(textFont);
+    listingNameText.setFillColor(sf::Color::Black);
+    listingNameText.setCharacterSize(15);
+    listingNameText.setPosition(35, 292);
+
+    // create text box for entering listing name
+    TextBox* listingNameBox = new TextBox(listingNameText, "Name", 389);
+    listingNameBox->setPosition(35, 290);
+    textBoxes["CreateListing"]["ListingName"] = listingNameBox;    // load into map for easy access
+
+    // text object for listing price textbox
+    sf::Text listingPriceText;
+    listingPriceText.setFont(textFont);
+    listingPriceText.setFillColor(sf::Color::Black);
+    listingPriceText.setCharacterSize(15);
+    listingPriceText.setPosition(526, 292);
+
+    // create text box for entering listing price
+    TextBox* listingPriceBox = new TextBox(listingPriceText, "Price", 70);
+    listingPriceBox->setPosition(526, 290);
+    textBoxes["CreateListing"]["ListingPrice"] = listingPriceBox;    // load into map for easy access
+
+    // text object for listing description textbox
+    sf::Text listingDescriptionText;
+    listingDescriptionText.setFont(textFont);
+    listingDescriptionText.setFillColor(sf::Color::Black);
+    listingDescriptionText.setCharacterSize(15);
+    listingDescriptionText.setPosition(35, 342);
+
+    // create text box for entering listing description
+    TextBox* listingDescriptionBox = new TextBox(listingDescriptionText, "Description", 980);
+    listingDescriptionBox->setPosition(35, 340);
+    textBoxes["CreateListing"]["ListingDescription"] = listingDescriptionBox;    // load into map for easy access
 }
 
 void Application::interpretKey(sf::Keyboard::Key keyCode){
+    if(keyCode == 57){
+        for(auto iter: textBoxes["CreateListing"]) {
+            if (iter.second->selected){
+                iter.second->addChar(' ');
+            }
+        }
+    }
+
     // if a valid key is pressed
     if(keyCode >= 0 && keyCode <= 35) {
         // if user is pressing shift
@@ -337,16 +422,62 @@ void Application::interpretKey(sf::Keyboard::Key keyCode){
     }
 }
 
+/*------------------------------------------------------------------------*/
+/*-------------------Create Listing Window Functionality------------------*/
+/*------------------------------------------------------------------------*/
+void Application::createListing(const std::string &name, const float &price, const std::string &description){
+    auto database = conn["user_data"];
+    auto collection = database["listings"];
+
+    bsoncxx::builder::basic::document document{};
+    document.append(bsoncxx::builder::basic::kvp("Name", name));
+    document.append(bsoncxx::builder::basic::kvp("Price", price));
+    document.append(bsoncxx::builder::basic::kvp("Description", description));
+
+    collection.insert_one(document.view());
+}
+
+void Application::renderCreateListingWindow(){
+    // header text
+    sf::Text headerText;
+    headerText.setFont(headerFont);
+    headerText.setFillColor({98, 115, 255});
+    headerText.setString("Create a food listing");
+    headerText.setPosition(2, 0);
+    headerText.setCharacterSize(40);
+
+    // set window background color
+    window->clear({223, 226, 255});
+
+    sf::RectangleShape windowHeader(sf::Vector2f(1050 , 50));
+    windowHeader.setPosition(0,0);
+    windowHeader.setFillColor({200, 200, 255});
+
+    window->draw(windowHeader);
+    window->draw(headerText);
+
+    // draw the buttons and text boxes on render window
+    for(auto iter : buttons["CreateListing"]){
+        window->draw(iter.second->getHitbox());
+        window->draw(iter.second->getRenderText());
+    }
+    for(auto iter : textBoxes["CreateListing"]){
+        window->draw(iter.second->getRect());
+        window->draw(iter.second->getRenderText());
+    }
+
+    // render window
+    window->display();
+}
+
 
 /*------------------------------------------------------------------------*/
 /*---------------------My Account Window Functionality--------------------*/
 /*------------------------------------------------------------------------*/
-
-// TODO: Change format of changeUsername and changePassword to be similar to
-//  createAccount and verifyLogin to reduce map traversals
 void Application::changeUsername(){
-    // TODO: Add comments
-
+    // TODO: Add comments, change format of changeUsername
+    //  and changePassword to be similar to createAccount
+    //  and verifyLogin to reduce map traversals
     if(textBoxes["MyAccount"]["NewUsername"]->getText() == currentUser){
         newUserErr = 2;
         return;
@@ -367,6 +498,8 @@ void Application::changeUsername(){
             newUserErr = 1;
         }
         else{
+            newUserErr = 4;
+
             bsoncxx::builder::stream::document getDoc;
             getDoc << "Username" << currentUser;
 
@@ -407,6 +540,8 @@ void Application::changePassword(){
            && textBoxes["MyAccount"]["ConfirmNewPassword"]->getText().size() > 0){
             if(currentPass != textBoxes["MyAccount"]["NewPassword"]->getText()){
                 if(textBoxes["MyAccount"]["NewPassword"]->getText() == textBoxes["MyAccount"]["ConfirmNewPassword"]->getText()){
+                    newPassErr = 5;
+
                     bsoncxx::builder::stream::document getDoc;
                     getDoc << "Username" << currentUser;
 
@@ -509,6 +644,11 @@ void Application::renderMyAccountWindow(){
         newUserErrorText.setString("Please enter a valid username.");
         newUserErrorText.setPosition(580, 250);
     }
+    else if(newUserErr == 4){
+        newUserErrorText.setFillColor({98, 115, 255});
+        newUserErrorText.setString("Username changed successfully!");
+        newUserErrorText.setPosition(580, 250);
+    }
 
 
     sf::Text newPassErrorText;
@@ -533,6 +673,11 @@ void Application::renderMyAccountWindow(){
         newPassErrorText.setString("Incorrect password.");
         newPassErrorText.setPosition(230, 250);
     }
+    else if(newPassErr == 5){
+        newPassErrorText.setFillColor({98, 115, 255});
+        newPassErrorText.setString("Password changed successfully!");
+        newPassErrorText.setPosition(185, 250);
+    }
 
     sf::Text newUser;
     newUser.setFont(textFont);
@@ -552,116 +697,10 @@ void Application::renderMyAccountWindow(){
     window->display();
 }
 
-void Application::runMyAccount(){
-    // TODO: Add comments
-
-    float mouseX;
-    float mouseY;
-
-    while(window->isOpen()){
-        renderMyAccountWindow();
-
-        sf::Event event;
-        while(window->pollEvent(event)) {
-            if(event.type == sf::Event::Closed) {
-                window->close();
-                return;
-            }
-
-            if(event.type == sf::Event::MouseButtonReleased) {
-                mouseX = sf::Mouse::getPosition(*window).x;
-                mouseY = sf::Mouse::getPosition(*window).y;
-
-                for(auto iter: textBoxes["MyAccount"]) {
-                    if(iter.second->getRect().getGlobalBounds().contains(mouseX, mouseY)) {
-                        for(auto iter2: textBoxes["MyAccount"]){
-                            iter2.second->selected = false;
-                            iter2.second->setColor(sf::Color::White);
-
-                            newPassErr = 0;
-                            newUserErr = 0;
-                        }
-                        iter.second->selected = true;
-                        iter.second->setColor({240, 240, 255});
-
-                        if(iter.second->getType() == "Password"){
-                            for(auto iter : textBoxes["MyAccount"]){
-                                if(iter.second->getType() == "Username"){
-                                    iter.second->reset();
-                                }
-                            }
-                        }
-                        else if(iter.second->getType() == "Username"){
-                            for(auto iter : textBoxes["MyAccount"]){
-                                if(iter.second->getType() == "Password"){
-                                    iter.second->reset();
-                                }
-                            }
-                        }
-                    }
-                }
-                for(auto iter: buttons["MyAccount"]) {
-                    if(iter.second->getHitbox().getGlobalBounds().contains(mouseX, mouseY)) {
-                        if(iter.second->getText() == "Back"){
-                            for(auto iter : textBoxes["MyAccount"]){
-                                iter.second->reset();
-                            }
-
-                            newUserErr = 0;
-                            newPassErr = 0;
-
-                            applicationState = "Ordering";
-                            return;
-                        }
-                        else if(iter.second->getText() == "Change Password"){
-                            newUserErr = 0;
-                            for(auto iter : textBoxes["MyAccount"]){
-                                if(iter.second->getType() == "Username"){
-                                    iter.second->reset();
-                                }
-                            }
-                            changePassword();
-                        }
-                        else if(iter.second->getText() == "Change Username"){
-                            for(auto iter : textBoxes["MyAccount"]){
-                                if(iter.second->getType() == "Password"){
-                                    iter.second->reset();
-                                }
-                            }
-                            newPassErr = 0;
-                            changeUsername();
-                        }
-                    }
-                }
-            }
-            else if(event.type == sf::Event::KeyPressed){
-                if(event.key.code == sf::Keyboard::Key::Enter){
-                    for(auto iter : textBoxes["MyAccount"]){
-                        if(iter.second->selected && iter.second->getType() == "Password"){
-                            changePassword();
-                        }
-                        else if(iter.second->selected && iter.second->getType() == "Username"){
-                            changeUsername();
-                        }
-                    }
-                }
-                else{
-                    newPassErr = 0;
-                    newUserErr = 0;
-                    interpretKey(event.key.code);
-                }
-            }
-
-            renderMyAccountWindow();
-        }
-    }
-}
-
 
 /*------------------------------------------------------------------------*/
 /*----------------------Ordering Window Functionality---------------------*/
 /*------------------------------------------------------------------------*/
-
 void Application::renderOrderWindow(){
     // TODO: Add comments
 
@@ -697,75 +736,10 @@ void Application::renderOrderWindow(){
     window->display();
 }
 
-void Application::runOrdering(){
-    float mouseX;
-    float mouseY;
-
-    while(window->isOpen()){
-        renderOrderWindow();
-
-        sf::Event event;
-        while(window->pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
-                window->close();
-                return;
-            }
-
-            if (event.type == sf::Event::MouseButtonReleased) {
-                mouseX = sf::Mouse::getPosition(*window).x;
-                mouseY = sf::Mouse::getPosition(*window).y;
-
-                for (auto iter: textBoxes["Ordering"]) {
-                    if (iter.second->getRect().getGlobalBounds().contains(mouseX, mouseY)) {
-                        for (auto iter2: textBoxes["Ordering"]) {
-                            iter2.second->selected = false;
-                            iter2.second->setColor(sf::Color::White);
-                        }
-                        iter.second->selected = true;
-                        iter.second->setColor({240, 240, 255});
-                    }
-                }
-                for(auto iter: buttons["Ordering"]) {
-                    if(iter.second->getHitbox().getGlobalBounds().contains(mouseX, mouseY)) {
-                        if(iter.second->getText() == "Log Out"){
-                            currentUser = "";
-                            applicationState = "Login";
-                            return;
-                        }
-                        else if(iter.second->getText() == "My Account"){
-                            applicationState = "MyAccount";
-                            runMyAccount();
-                        }
-                    }
-                }
-            }
-            else if(event.type == sf::Event::KeyPressed){
-                if(event.key.code == sf::Keyboard::Key::Enter){
-                    if(createAccount(textBoxes["CreateAccount"]["CreateUser"]->getText(),
-                                     textBoxes["CreateAccount"]["CreatePass"]->getText())){
-                        for(auto iter : textBoxes["CreateAccount"]){
-                            iter.second->reset();
-                        }
-
-                        applicationState = "Login";
-                        return;
-                    }
-                }
-                else{
-                    interpretKey(event.key.code);
-                }
-            }
-
-            renderOrderWindow();
-        }
-    }
-}
-
 
 /*------------------------------------------------------------------------*/
 /*-------------------Create-Account Window Functionality------------------*/
 /*------------------------------------------------------------------------*/
-
 bool Application::createAccount(const std::string& username, const std::string& password){
     // TODO: Add comments
 
@@ -857,91 +831,10 @@ void Application::renderCreateAccWindow(){
     window->display();
 }
 
-void Application::runCreateAcc(){
-    float mouseX;
-    float mouseY;
-
-    while(window->isOpen()){
-        renderCreateAccWindow();
-
-        sf::Event event;
-        while(window->pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
-                window->close();
-                return;
-            }
-
-            if (event.type == sf::Event::MouseButtonReleased) {
-                mouseX = sf::Mouse::getPosition(*window).x;
-                mouseY = sf::Mouse::getPosition(*window).y;
-
-                for (auto iter: textBoxes["CreateAccount"]) {
-                    if (iter.second->getRect().getGlobalBounds().contains(mouseX, mouseY)) {
-                        for (auto iter2: textBoxes["CreateAccount"]) {
-                            iter2.second->selected = false;
-                            iter2.second->setColor(sf::Color::White);
-                        }
-                        iter.second->selected = true;
-                        iter.second->setColor({240, 240, 255});
-
-                        accountErr = 0;
-                    }
-                }
-                for(auto iter: buttons["CreateAccount"]) {
-                    if (iter.second->getHitbox().getGlobalBounds().contains(mouseX, mouseY)) {
-                        if(iter.second->getText() == "Back"){
-                            for(auto iter : textBoxes["CreateAccount"]){
-                                iter.second->reset();
-                            }
-
-                            accountErr = 0;
-
-                            applicationState = "Login";
-                            return;
-                        }
-                        else if(iter.second->getText() == "Create Account"){
-                            if(createAccount(textBoxes["CreateAccount"]["CreateUser"]->getText(),
-                                          textBoxes["CreateAccount"]["CreatePass"]->getText())){
-                                for(auto iter : textBoxes["CreateAccount"]){
-                                    iter.second->reset();
-                                }
-
-                                applicationState = "Login";
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-            else if(event.type == sf::Event::KeyPressed){
-                if(event.key.code == sf::Keyboard::Key::Enter){
-                    if(createAccount(textBoxes["CreateAccount"]["CreateUser"]->getText(),
-                                  textBoxes["CreateAccount"]["CreatePass"]->getText())){
-                        for(auto iter : textBoxes["CreateAccount"]){
-                            iter.second->reset();
-                        }
-
-                        applicationState = "Login";
-                        return;
-                    }
-                }
-                else{
-                    accountErr = 0;
-
-                    interpretKey(event.key.code);
-                }
-            }
-
-            renderCreateAccWindow();
-        }
-    }
-}
-
 
 /*------------------------------------------------------------------------*/
 /*-----------------------Login Window Functionality-----------------------*/
 /*------------------------------------------------------------------------*/
-
 void Application::verifyLogin(const std::string& username, const std::string& password){
     // TODO: Add comments
 
@@ -952,32 +845,37 @@ void Application::verifyLogin(const std::string& username, const std::string& pa
         auto resultUserSearch = collection.find_one(
                 bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("Username", username)));
 
-        try{
-            std::string input = bsoncxx::to_json(*resultUserSearch);
+        if(!resultUserSearch){
+            loginErr = 2;
+        }
+        else{
+            try{
+                std::string input = bsoncxx::to_json(*resultUserSearch);
 
-            if(input.size() > 3){
-                bsoncxx::document::view getPass = resultUserSearch->view();
-                std::string passResult = getPass["Password"].get_utf8().value.to_string();
+                if(input.size() > 3){
+                    bsoncxx::document::view getPass = resultUserSearch->view();
+                    std::string passResult = getPass["Password"].get_utf8().value.to_string();
 
-                // login success
-                if(passResult == password){
-                    for(auto iter : textBoxes["Login"]){
-                        iter.second->reset();
+                    // login success
+                    if(passResult == password){
+                        for(auto iter : textBoxes["Login"]){
+                            iter.second->reset();
+                        }
+
+                        currentUser = username;
+                        applicationState = "Ordering";
                     }
-
-                    currentUser = username;
-                    runOrdering();
+                    else{
+                        loginErr = 2;
+                    }
                 }
                 else{
                     loginErr = 2;
                 }
             }
-            else{
-                loginErr = 2;
+            catch(const std::exception& e){
+                loginErr = 1;
             }
-        }
-        catch(const std::exception& e){
-            std::cout << "Login error" << std::endl;
         }
     }
     else{
@@ -1047,8 +945,12 @@ void Application::renderLoginWindow(){
     window->display();
 }
 
-void Application::runLogin(){
-    loadItems();
+
+/*------------------------------------------------------------------------*/
+/*------------------------Main Application Driver-------------------------*/
+/*------------------------------------------------------------------------*/
+
+void Application::run(){
     float mouseX;
     float mouseY;
 
@@ -1063,49 +965,181 @@ void Application::runLogin(){
                 mouseX = sf::Mouse::getPosition(*window).x;
                 mouseY = sf::Mouse::getPosition(*window).y;
 
-                for(auto iter : textBoxes["Login"]){
-                    if(iter.second->getRect().getGlobalBounds().contains(mouseX, mouseY)){
-                        for(auto iter2 : textBoxes["Login"]){
+                for(auto textBox : textBoxes[applicationState]){
+                    if(textBox.second->getRect().getGlobalBounds().contains(mouseX, mouseY)){
+                        for(auto iter2 : textBoxes[applicationState]){
                             iter2.second->selected = false;
                             iter2.second->setColor(sf::Color::White);
                         }
-                        iter.second->selected = true;
-                        iter.second->setColor({240, 240, 255});
+                        textBox.second->selected = true;
+                        textBox.second->setColor({240, 240, 255});
+
                         loginErr = 0;
+                        accountErr = 0;
+                        newUserErr = 0;
+                        newPassErr = 0;
+
+                        if(applicationState == "MyAccount"){
+                            if(textBox.second->getType() == "Password"){
+                                for(auto iter : textBoxes["MyAccount"]){
+                                    if(iter.second->getType() == "Username"){
+                                        iter.second->reset();
+                                    }
+                                }
+                            }
+                            else if(textBox.second->getType() == "Username"){
+                                for(auto iter : textBoxes["MyAccount"]){
+                                    if(iter.second->getType() == "Password"){
+                                        iter.second->reset();
+                                    }
+                                }
+                            }
+                        }
                     }
-                }
-                for(auto iter : buttons["Login"]){
-                    if(iter.second->getHitbox().getGlobalBounds().contains(mouseX, mouseY)){
-                        if(iter.second->getText() == "Create Account"){
-                            for(auto iter : textBoxes["Login"]){
+                    else if(textBox.second->getText() == "Create Account"){
+                        if(createAccount(textBoxes["CreateAccount"]["CreateUser"]->getText(),
+                                         textBoxes["CreateAccount"]["CreatePass"]->getText())){
+                            for(auto iter : textBoxes["CreateAccount"]){
                                 iter.second->reset();
                             }
 
-                            loginErr = 0;
-                            applicationState = "CreateAccount";
-                            runCreateAcc();
+                            applicationState = "Login";
+                            return;
                         }
-                        else{
+                    }
+                }
+                for(auto button : buttons[applicationState]){
+                    if(button.second->getHitbox().getGlobalBounds().contains(mouseX, mouseY)){
+                        if(button.second->getText() == "Create Account"){
+                            if(applicationState == "Login"){
+                                for(auto iter : textBoxes["Login"]){
+                                    iter.second->reset();
+                                }
+                                loginErr = 0;
+                                applicationState = "CreateAccount";
+                            }
+                            else if(applicationState == "CreateAccount"){
+                                if(createAccount(textBoxes["CreateAccount"]["CreateUser"]->getText(),
+                                                 textBoxes["CreateAccount"]["CreatePass"]->getText())){
+                                    for(auto iter : textBoxes["CreateAccount"]){
+                                        iter.second->reset();
+                                    }
+
+                                    applicationState = "Login";
+                                }
+                            }
+                        }
+                        else if(button.second->getText() == "Back"){
+                            for(auto iter : textBoxes[applicationState]){
+                                iter.second->reset();
+                            }
+
+                            if(applicationState == "CreateAccount"){
+                                applicationState = "Login";
+                                accountErr = 0;
+                            }
+                            else if(applicationState == "MyAccount"){
+                                newUserErr = 0;
+                                newPassErr = 0;
+                                applicationState = "Ordering";
+                            }
+                            else if(applicationState == "CreateListing"){
+                                applicationState = "Ordering";
+                            }
+                        }
+                        else if(button.second->getText() == "Log Out"){
+                            currentUser = "";
+                            applicationState = "Login";
+                        }
+                        else if(button.second->getText() == "My Account"){
+                            applicationState = "MyAccount";
+                        }
+                        else if(button.second->getText() == "+"){
+                            applicationState = "CreateListing";
+                        }
+                        else if(button.second->getText() == "Log in"){
                             verifyLogin(textBoxes["Login"]["Username"]->getText(), textBoxes["Login"]["Password"]->getText());
+                        }
+                        else if(button.second->getText() == "Change Password"){
+                            newUserErr = 0;
+                            for(auto iter : textBoxes["MyAccount"]){
+                                if(iter.second->getType() == "Username"){
+                                    iter.second->reset();
+                                }
+                            }
+                            changePassword();
+                        }
+                        else if(button.second->getText() == "Change Username"){
+                            for(auto iter : textBoxes["MyAccount"]){
+                                if(iter.second->getType() == "Password"){
+                                    iter.second->reset();
+                                }
+                            }
+                            newPassErr = 0;
+                            changeUsername();
+                        }
+                        else if(button.second->getText() == "Create Listing"){
+                            std::cout << "Create clicked" << std::endl;
                         }
                     }
                 }
             }
             else if(event.type == sf::Event::KeyPressed){
                 if(event.key.code == sf::Keyboard::Key::Enter){
-                    verifyLogin(textBoxes["Login"]["Username"]->getText(), textBoxes["Login"]["Password"]->getText());
+                    if(applicationState == "Login"){
+                        verifyLogin(textBoxes["Login"]["Username"]->getText(), textBoxes["Login"]["Password"]->getText());
+                    }
+                    else if(applicationState == "CreateAccount"){
+                        if(createAccount(textBoxes["CreateAccount"]["CreateUser"]->getText(),
+                                         textBoxes["CreateAccount"]["CreatePass"]->getText())){
+                            for(auto iter : textBoxes["CreateAccount"]){
+                                iter.second->reset();
+                            }
+
+                            applicationState = "Login";
+                        }
+                    }
+                    else if(applicationState == "MyAccount"){
+                        for(auto textBox : textBoxes["MyAccount"]){
+                            if(textBox.second->selected && textBox.second->getType() == "Password"){
+                                changePassword();
+                            }
+                            else if(textBox.second->selected && textBox.second->getType() == "Username"){
+                                changeUsername();
+                            }
+                        }
+                    }
                 }
                 else{
+                    accountErr = 0;
                     loginErr = 0;
                     interpretKey(event.key.code);
                 }
             }
-            renderLoginWindow();
+
+            if(applicationState == "Login"){
+                renderLoginWindow();
+            }
+            else if(applicationState == "CreateAccount"){
+                renderCreateAccWindow();
+            }
+            else if(applicationState == "Ordering"){
+                renderOrderWindow();
+            }
+            else if(applicationState == "MyAccount"){
+                renderMyAccountWindow();
+            }
+            else if(applicationState == "CreateListing"){
+                renderCreateListingWindow();
+            }
         }
     }
 }
 
 Application::Application(){
+    // load all items into the program
+    loadItems();
+
     // create the application window
     window = new sf::RenderWindow(sf::VideoMode(1050, 600), "Campus Central Food");
 
@@ -1127,7 +1161,6 @@ Application::Application(){
 /*------------------------------------------------------------------------*/
 /*----------------------------Button Functions----------------------------*/
 /*------------------------------------------------------------------------*/
-
 sf::Text Button::getRenderText(){
     return buttonRenderText;
 }
@@ -1149,11 +1182,21 @@ Button::Button(sf::Text inputText){
     buttonText = inputText.getString();
 }
 
+/*------------------------------------------------------------------------*/
+/*----------------------------Listing Functions---------------------------*/
+/*------------------------------------------------------------------------*/
+Listing::Listing(const std::string& name, const float& price, const std::string& description, const std::string& currentUser){
+    this->name = name;
+    this->price = price;
+    this->owner = currentUser;
+    this->description = description;
+
+    background = sf::RectangleShape();
+}
 
 /*------------------------------------------------------------------------*/
 /*---------------------------TextBox Functions----------------------------*/
 /*------------------------------------------------------------------------*/
-
 void TextBox::setPosition(float x, float y){
     hitbox.setPosition({x, y});
 }
@@ -1167,18 +1210,25 @@ sf::RectangleShape TextBox::getRect(){
 }
 
 void TextBox::addChar(char character){
-    if(boxText.size() < 18){
-        boxText += character;
-
-        if(type == "Username"){
-            boxRenderText.setString(boxText);
+    if(type == "Password"){
+        std::string hideText;
+        for(int i = 0; i < boxText.size(); i++){
+            hideText += '*';
         }
-        else if(type == "Password"){
-            std::string hideText;
-            for(int i = 0; i < boxText.size() - 1; i++){
-                hideText += '*';
-            }
+        sf::Text tempRenderText = boxRenderText;
+        tempRenderText.setString(hideText + character);
+        if(tempRenderText.getGlobalBounds().getSize().x < hitbox.getSize().x){
+            boxText += character;
             boxRenderText.setString(hideText + character);
+        }
+    }
+    else{
+        sf::Text tempRenderText = boxRenderText;
+        tempRenderText.setString(boxText + character);
+
+        if(tempRenderText.getGlobalBounds().getSize().x < hitbox.getSize().x){
+            boxText += character;
+            boxRenderText.setString(boxText);
         }
     }
 }
@@ -1194,16 +1244,15 @@ sf::Text TextBox::getRenderText(){
 void TextBox::backspace(){
     boxText.erase(boxText.end() - 1);
 
-    if(type == "Username"){
-        boxRenderText.setString(boxText);
-    }
-    else if(type == "Password"){
+    if(type == "Password"){
         std::string hideText;
         for(char i : boxText){
             hideText += '*';
         }
         boxRenderText.setString(hideText);
-
+    }
+    else{
+        boxRenderText.setString(boxText);
     }
 }
 
@@ -1218,12 +1267,12 @@ std::string TextBox::getType(){
     return type;
 }
 
-TextBox::TextBox(sf::Text inputRenderText, const std::string& type){
+TextBox::TextBox(sf::Text& inputRenderText, const std::string& type, const float& width){
     this->type = type;
 
     boxText = "";
     boxRenderText = inputRenderText;
-    hitbox.setSize({250, 25});
+    hitbox.setSize({width, 25});
     hitbox.setOutlineColor(sf::Color::Black);
     hitbox.setOutlineThickness(2);
 }
