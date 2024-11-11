@@ -6,6 +6,8 @@
 void Application::loadItems(){
     // TODO: Organize by section
 
+    loadListings();
+
     // load fonts from folder
     headerFont.loadFromFile("../fonts/Open_Sans/static/OpenSans-ExtraBold.ttf");
     textFont.loadFromFile("../fonts/Open_Sans/static/OpenSans-Regular.ttf");
@@ -330,11 +332,11 @@ void Application::loadItems(){
     listingNameText.setFont(textFont);
     listingNameText.setFillColor(sf::Color::Black);
     listingNameText.setCharacterSize(15);
-    listingNameText.setPosition(35, 292);
+    listingNameText.setPosition(35, 282);
 
     // create text box for entering listing name
     TextBox* listingNameBox = new TextBox(listingNameText, "Name", 389);
-    listingNameBox->setPosition(35, 290);
+    listingNameBox->setPosition(35, 280);
     textBoxes["CreateListing"]["ListingName"] = listingNameBox;    // load into map for easy access
 
     // text object for listing price textbox
@@ -342,11 +344,11 @@ void Application::loadItems(){
     listingPriceText.setFont(textFont);
     listingPriceText.setFillColor(sf::Color::Black);
     listingPriceText.setCharacterSize(15);
-    listingPriceText.setPosition(526, 292);
+    listingPriceText.setPosition(525, 282);
 
     // create text box for entering listing price
     TextBox* listingPriceBox = new TextBox(listingPriceText, "Price", 70);
-    listingPriceBox->setPosition(526, 290);
+    listingPriceBox->setPosition(525, 280);
     textBoxes["CreateListing"]["ListingPrice"] = listingPriceBox;    // load into map for easy access
 
     // text object for listing description textbox
@@ -422,19 +424,55 @@ void Application::interpretKey(sf::Keyboard::Key keyCode){
     }
 }
 
+void Application::loadListings(){
+    listings = {};
+    eateries = {};
+
+    auto database = conn["user_data"];
+    auto userCollection = database["users"];
+    auto listingCollection = database["listings"];
+
+
+    auto items = listingCollection.find({});
+
+    for(auto document : items){
+        auto user = userCollection.find_one(
+                bsoncxx::builder::basic::make_document(
+                        bsoncxx::builder::basic::kvp("_id",
+                                                     bsoncxx::oid{document["OwnerID"].get_utf8().value.to_string()})));
+        auto userConvert = user->view();
+
+        Listing listing(document["Name"].get_utf8().value.to_string(),
+                        document["Price"].get_utf8().value.to_string(),
+                        document["Description"].get_utf8().value.to_string(),
+                        document["OwnerID"].get_utf8().value.to_string(),
+                        userConvert["Username"].get_utf8().value.to_string(),
+                        textFont);
+        listings[document["OwnerID"].get_utf8().value.to_string()].push_back(listing);
+    }
+
+    for(auto user : listings){
+        Eatery eatery(user.second[0].ownerName, user.second[0].ownerID, headerFont);
+        eateries.push_back(eatery);
+    }
+}
+
 /*------------------------------------------------------------------------*/
 /*-------------------Create Listing Window Functionality------------------*/
 /*------------------------------------------------------------------------*/
-void Application::createListing(const std::string &name, const float &price, const std::string &description){
+bool Application::createListing(const std::string& name, const std::string& price, const std::string& description){
     auto database = conn["user_data"];
     auto collection = database["listings"];
 
     bsoncxx::builder::basic::document document{};
     document.append(bsoncxx::builder::basic::kvp("Name", name));
+    document.append(bsoncxx::builder::basic::kvp("OwnerID", userID));
     document.append(bsoncxx::builder::basic::kvp("Price", price));
     document.append(bsoncxx::builder::basic::kvp("Description", description));
 
     collection.insert_one(document.view());
+
+    return true;
 }
 
 void Application::renderCreateListingWindow(){
@@ -453,6 +491,31 @@ void Application::renderCreateListingWindow(){
     windowHeader.setPosition(0,0);
     windowHeader.setFillColor({200, 200, 255});
 
+    sf::Text listingName;
+    listingName.setFont(textFont);
+    listingName.setFillColor({98, 115, 255});
+    listingName.setString("Listing Name:");
+    listingName.setPosition(35, 252);
+    listingName.setCharacterSize(20);
+
+    sf::Text listingPrice;
+    listingPrice.setFont(textFont);
+    listingPrice.setFillColor({98, 115, 255});
+    listingPrice.setString("Price:");
+    listingPrice.setPosition(525, 252);
+    listingPrice.setCharacterSize(20);
+
+    sf::Text listingDescription;
+    listingDescription.setFont(textFont);
+    listingDescription.setFillColor({98, 115, 255});
+    listingDescription.setString("Listing Description:");
+    listingDescription.setPosition(35, 312);
+    listingDescription.setCharacterSize(20);
+
+
+    window->draw(listingName);
+    window->draw(listingPrice);
+    window->draw(listingDescription);
     window->draw(windowHeader);
     window->draw(headerText);
 
@@ -732,6 +795,27 @@ void Application::renderOrderWindow(){
         window->draw(iter.second->getRenderText());
     }
 
+    float column = 0;
+    float row = 0;
+    for(auto eatery : eateries){
+        eatery.background.setPosition({20 + (column * 220), 70 + (row * 220)});
+        eatery.renderName.setPosition({119 + (column * 220), 82 + (row * 220)});
+
+        eatery.background.setOutlineThickness(2);
+        eatery.background.setOutlineColor(sf::Color::Black);
+
+        window->draw(eatery.background);
+        window->draw(eatery.renderName);
+
+        if(column < 3){
+            column++;
+        }
+        else{
+            row++;
+            column = 0;
+        }
+    }
+
     // render window
     window->display();
 }
@@ -853,17 +937,17 @@ void Application::verifyLogin(const std::string& username, const std::string& pa
                 std::string input = bsoncxx::to_json(*resultUserSearch);
 
                 if(input.size() > 3){
-                    bsoncxx::document::view getPass = resultUserSearch->view();
-                    std::string passResult = getPass["Password"].get_utf8().value.to_string();
-
+                    bsoncxx::document::view getUser = resultUserSearch->view();
+                    std::string passResult = getUser["Password"].get_utf8().value.to_string();
                     // login success
                     if(passResult == password){
                         for(auto iter : textBoxes["Login"]){
                             iter.second->reset();
                         }
-
+                        userID = getUser["_id"].get_oid().value.to_string();
                         currentUser = username;
                         applicationState = "Ordering";
+                        loadListings();
                     }
                     else{
                         loginErr = 2;
@@ -1012,8 +1096,8 @@ void Application::run(){
                     if(button.second->getHitbox().getGlobalBounds().contains(mouseX, mouseY)){
                         if(button.second->getText() == "Create Account"){
                             if(applicationState == "Login"){
-                                for(auto iter : textBoxes["Login"]){
-                                    iter.second->reset();
+                                for(auto textBox : textBoxes[applicationState]){
+                                    textBox.second->reset();
                                 }
                                 loginErr = 0;
                                 applicationState = "CreateAccount";
@@ -1021,8 +1105,8 @@ void Application::run(){
                             else if(applicationState == "CreateAccount"){
                                 if(createAccount(textBoxes["CreateAccount"]["CreateUser"]->getText(),
                                                  textBoxes["CreateAccount"]["CreatePass"]->getText())){
-                                    for(auto iter : textBoxes["CreateAccount"]){
-                                        iter.second->reset();
+                                    for(auto textBox : textBoxes["CreateAccount"]){
+                                        textBox.second->reset();
                                     }
 
                                     applicationState = "Login";
@@ -1030,8 +1114,8 @@ void Application::run(){
                             }
                         }
                         else if(button.second->getText() == "Back"){
-                            for(auto iter : textBoxes[applicationState]){
-                                iter.second->reset();
+                            for(auto textBox : textBoxes[applicationState]){
+                                textBox.second->reset();
                             }
 
                             if(applicationState == "CreateAccount"){
@@ -1049,6 +1133,7 @@ void Application::run(){
                         }
                         else if(button.second->getText() == "Log Out"){
                             currentUser = "";
+                            userID = "";
                             applicationState = "Login";
                         }
                         else if(button.second->getText() == "My Account"){
@@ -1057,29 +1142,36 @@ void Application::run(){
                         else if(button.second->getText() == "+"){
                             applicationState = "CreateListing";
                         }
-                        else if(button.second->getText() == "Log in"){
+                        else if(button.second->getText() == "Log In"){
                             verifyLogin(textBoxes["Login"]["Username"]->getText(), textBoxes["Login"]["Password"]->getText());
                         }
                         else if(button.second->getText() == "Change Password"){
                             newUserErr = 0;
-                            for(auto iter : textBoxes["MyAccount"]){
-                                if(iter.second->getType() == "Username"){
-                                    iter.second->reset();
+                            for(auto textBox : textBoxes[applicationState]){
+                                if(textBox.second->getType() == "Username"){
+                                    textBox.second->reset();
                                 }
                             }
                             changePassword();
                         }
                         else if(button.second->getText() == "Change Username"){
-                            for(auto iter : textBoxes["MyAccount"]){
-                                if(iter.second->getType() == "Password"){
-                                    iter.second->reset();
+                            for(auto textBox : textBoxes[applicationState]){
+                                if(textBox.second->getType() == "Password"){
+                                    textBox.second->reset();
                                 }
                             }
                             newPassErr = 0;
                             changeUsername();
                         }
                         else if(button.second->getText() == "Create Listing"){
-                            std::cout << "Create clicked" << std::endl;
+                            if(createListing(textBoxes["CreateListing"]["ListingName"]->getText(), textBoxes["CreateListing"]["ListingPrice"]->getText(),
+                                             textBoxes["CreateListing"]["ListingDescription"]->getText())){
+                                for(auto textBox : textBoxes[applicationState]){
+                                    textBox.second->reset();
+                                }
+                                applicationState = "Ordering";
+                                loadListings();
+                            }
                         }
                     }
                 }
@@ -1095,7 +1187,6 @@ void Application::run(){
                             for(auto iter : textBoxes["CreateAccount"]){
                                 iter.second->reset();
                             }
-
                             applicationState = "Login";
                         }
                     }
@@ -1107,6 +1198,16 @@ void Application::run(){
                             else if(textBox.second->selected && textBox.second->getType() == "Username"){
                                 changeUsername();
                             }
+                        }
+                    }
+                    else if(applicationState == "CreateListing"){
+                        if(createListing(textBoxes["CreateListing"]["ListingName"]->getText(), textBoxes["CreateListing"]["ListingPrice"]->getText(),
+                                         textBoxes["CreateListing"]["ListingDescription"]->getText())){
+                            for(auto textBox : textBoxes[applicationState]){
+                                textBox.second->reset();
+                            }
+                            applicationState = "Ordering";
+                            loadListings();
                         }
                     }
                 }
@@ -1137,8 +1238,6 @@ void Application::run(){
 }
 
 Application::Application(){
-    // load all items into the program
-    loadItems();
 
     // create the application window
     window = new sf::RenderWindow(sf::VideoMode(1050, 600), "Campus Central Food");
@@ -1155,6 +1254,9 @@ Application::Application(){
     // Create an instance.
     uri = mongocxx::uri{"mongodb+srv://default_user:defaultPassword@group6ccf.ka8iy.mongodb.net/?retryWrites=true&w=majority&appName=Group6CCF"};
     conn = mongocxx::client{uri};
+
+    // load all items into the program
+    loadItems();
 }
 
 
@@ -1182,16 +1284,35 @@ Button::Button(sf::Text inputText){
     buttonText = inputText.getString();
 }
 
+
 /*------------------------------------------------------------------------*/
-/*----------------------------Listing Functions---------------------------*/
+/*-----------------------Listing/Eatery Constructors----------------------*/
 /*------------------------------------------------------------------------*/
-Listing::Listing(const std::string& name, const float& price, const std::string& description, const std::string& currentUser){
+Listing::Listing(const std::string& name, const std::string& price, const std::string& description,
+                 const std::string& ownerID, const std::string& ownerName, sf::Font& textFont){
     this->name = name;
     this->price = price;
-    this->owner = currentUser;
+    this->ownerID = ownerID;
+    this->ownerName = ownerName;
     this->description = description;
 
-    background = sf::RectangleShape();
+
+    background.setFillColor(sf::Color::White);
+    background.setSize({200,200});
+}
+
+Eatery::Eatery(const std::string& name, const std::string& userID, sf::Font& textFont){
+    this->name = name;
+    this->userID = userID;
+
+    background.setFillColor(sf::Color::White);
+    background.setSize({200,200});
+
+    renderName.setString(name);
+    renderName.setFont(textFont);
+    renderName.setFillColor(sf::Color::Black);
+    renderName.setCharacterSize(12);
+    renderName.setOrigin({renderName.getGlobalBounds().getSize().x / 2, renderName.getGlobalBounds().getSize().y / 2});
 }
 
 /*------------------------------------------------------------------------*/
@@ -1223,12 +1344,14 @@ void TextBox::addChar(char character){
         }
     }
     else{
-        sf::Text tempRenderText = boxRenderText;
-        tempRenderText.setString(boxText + character);
+        if(type != "Price" || (type == "Price" && (isdigit(character) || character == '.' || character == ','))){
+            sf::Text tempRenderText = boxRenderText;
+            tempRenderText.setString(boxText + character);
 
-        if(tempRenderText.getGlobalBounds().getSize().x < hitbox.getSize().x){
-            boxText += character;
-            boxRenderText.setString(boxText);
+            if(tempRenderText.getGlobalBounds().getSize().x < hitbox.getSize().x){
+                boxText += character;
+                boxRenderText.setString(boxText);
+            }
         }
     }
 }

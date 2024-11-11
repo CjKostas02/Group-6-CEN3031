@@ -32,14 +32,28 @@ public:
 };
 
 struct Listing{
-    float price;
     std::string name;
-    std::string owner;
+    std::string price;
+    std::string ownerID;
+    std::string ownerName;
     std::string description;
     std::vector<Button> buttons;
     sf::RectangleShape background;
 
-    Listing(const std::string& name, const float& price, const std::string& description, const std::string& currentUser);
+    Listing(const std::string& name, const std::string& price,
+            const std::string& description,
+            const std::string& ownerID,
+            const std::string& ownerName,
+            sf::Font& textFont);
+};
+
+struct Eatery{
+    std::string name;
+    std::string userID;
+    sf::Text renderName;
+    sf::RectangleShape background;
+
+    Eatery(const std::string& name, const std::string& userID, sf::Font& textFont);
 };
 
 class TextBox{
@@ -82,10 +96,13 @@ private:
     int accountErr;
     int newPassErr;
     int newUserErr;
+    std::string userID;
     std::string currentUser;
     sf::RenderWindow* window;
     std::vector<char> characters;
     std::string applicationState;
+    std::vector<Eatery> eateries;
+    std::map<std::string, std::vector<Listing>> listings;
     std::map<std::string, std::map<std::string, Button*>> buttons;
     std::map<std::string, std::map<std::string, TextBox*>> textBoxes;
 
@@ -94,22 +111,23 @@ public:
     mongocxx::client conn;
     mongocxx::instance inst{};
 
-    // window driver prototypes
+    // function prototypes
     void run();
+    void loadItems();
+    void loadListings();
     void changePassword();
     void changeUsername();
+    void interpretKey(sf::Keyboard::Key keyCode);
     void verifyLogin(const std::string& username, const std::string& password);
     bool createAccount(const std::string& username, const std::string& password);
-    void createListing(const std::string& name, const float& price, const std::string& description);
+    bool createListing(const std::string& name, const std::string& price, const std::string& description);
 
-    // function prototypes
-    void loadItems();
+    // render function prototypes
     void renderLoginWindow();
     void renderOrderWindow();
     void renderMyAccountWindow();
     void renderCreateAccWindow();
     void renderCreateListingWindow();
-    void interpretKey(sf::Keyboard::Key keyCode);
 
     // constructor
     Application();
