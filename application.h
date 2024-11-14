@@ -37,6 +37,7 @@ struct Listing{
     std::string ownerID;
     std::string ownerName;
     std::string description;
+    sf::Text renderName;
     std::vector<Button> buttons;
     sf::RectangleShape background;
 
@@ -99,6 +100,7 @@ private:
     std::string userID;
     std::string currentUser;
     sf::RenderWindow* window;
+    std::string selectedEatery;
     std::vector<char> characters;
     std::string applicationState;
     std::vector<Eatery> eateries;
@@ -124,9 +126,10 @@ public:
 
     // render function prototypes
     void renderLoginWindow();
-    void renderOrderWindow();
     void renderMyAccountWindow();
     void renderCreateAccWindow();
+    void renderSelectEateryWindow();
+    void renderSelectListingWindow();
     void renderCreateListingWindow();
 
     // constructor
