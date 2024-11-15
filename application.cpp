@@ -29,7 +29,7 @@ void Application::loadItems(){
     usernameText.setPosition(400, 402);
 
     // create text box for entering username
-    TextBox* usernameBox = new TextBox(usernameText, "Username");
+    auto* usernameBox = new TextBox(usernameText, "Username");
     usernameBox->setPosition(400, 400);
     textBoxes["Login"]["Username"] = usernameBox;    // load into map for easy access
 
@@ -41,7 +41,7 @@ void Application::loadItems(){
     passwordText.setPosition(400, 462);
 
     // create text box for entering password
-    TextBox* passwordBox = new TextBox(passwordText, "Password");
+    auto* passwordBox = new TextBox(passwordText, "Password");
     passwordBox->setPosition(400, 460);
     textBoxes["Login"]["Password"] = passwordBox;    // load into map for easy access
 
@@ -65,7 +65,7 @@ void Application::loadItems(){
     createPassText.setPosition(400, 462);
 
     // create text box for creating password
-    TextBox* createPassBox = new TextBox(createPassText, "Password");
+    auto* createPassBox = new TextBox(createPassText, "Password");
     createPassBox->setPosition(400, 460);
     textBoxes["CreateAccount"]["CreatePass"] = createPassBox;    // load into map for easy access
 
@@ -83,7 +83,7 @@ void Application::loadItems(){
     createAccHitbox.setFillColor({223, 226, 255});
 
     // create account button object
-    Button* createAccButton = new Button(createAccText);
+    auto* createAccButton = new Button(createAccText);
     createAccButton->setHitbox(createAccHitbox);
 
     // add create-account button to map of buttons for easy access
@@ -103,7 +103,7 @@ void Application::loadItems(){
     loginHitbox.setFillColor({98,115,255});
 
     // log in button object
-    Button* loginButton = new Button(loginText);
+    auto* loginButton = new Button(loginText);
     loginButton->setHitbox(loginHitbox);
 
     // add log in button to map of buttons for easy access
@@ -123,7 +123,7 @@ void Application::loadItems(){
     completeCreateHitbox.setFillColor({98,115,255});
 
     // create account button object
-    Button* confirmCreateButton = new Button(completeCreateText);
+    auto* confirmCreateButton = new Button(completeCreateText);
     confirmCreateButton->setHitbox(completeCreateHitbox);
 
     // add create account button to map of buttons for easy access
@@ -143,7 +143,7 @@ void Application::loadItems(){
     backHitbox.setFillColor({223, 226, 255});
 
     // button object for back-button
-    Button* backButton = new Button(backText);
+    auto* backButton = new Button(backText);
     backButton->setHitbox(backHitbox);
 
     // add back button to map of buttons for easy access
@@ -175,7 +175,7 @@ void Application::loadItems(){
     viewAccHitbox.setFillColor({200, 200, 255});
 
     // my account button object
-    Button* viewAccButton = new Button(viewAccText);
+    auto* viewAccButton = new Button(viewAccText);
     viewAccButton->setHitbox(viewAccHitbox);
 
     // add My Account button to map of buttons for easy access
@@ -195,7 +195,7 @@ void Application::loadItems(){
     logoutHitbox.setFillColor({200, 200, 255});
 
     // log out button object
-    Button* logoutButton = new Button(logoutText);
+    auto* logoutButton = new Button(logoutText);
     logoutButton->setHitbox(logoutHitbox);
 
     // add log out button to map of buttons for easy access
@@ -209,7 +209,7 @@ void Application::loadItems(){
     currentPassText.setPosition(200, 342);
 
     // create text box for entering current password
-    TextBox* currentPassBox = new TextBox(currentPassText, "Password");
+    auto* currentPassBox = new TextBox(currentPassText, "Password");
     currentPassBox->setPosition(200, 340);
     textBoxes["MyAccount"]["CurrentPassword"] = currentPassBox;    // load into map for easy access
 
@@ -221,7 +221,7 @@ void Application::loadItems(){
     newPassText.setPosition(200, 402);
 
     // create text box for entering new password
-    TextBox* newPassBox = new TextBox(newPassText, "Password");
+    auto* newPassBox = new TextBox(newPassText, "Password");
     newPassBox->setPosition(200, 400);
     textBoxes["MyAccount"]["NewPassword"] = newPassBox;    // load into map for easy access
 
@@ -233,7 +233,7 @@ void Application::loadItems(){
     confirmNewPassText.setPosition(200, 462);
 
     // create text box for confirming new password
-    TextBox* confirmNewPassBox = new TextBox(confirmNewPassText, "Password");
+    auto* confirmNewPassBox = new TextBox(confirmNewPassText, "Password");
     confirmNewPassBox->setPosition(200, 460);
     textBoxes["MyAccount"]["ConfirmNewPassword"] = confirmNewPassBox;    // load into map for easy access
 
@@ -251,7 +251,7 @@ void Application::loadItems(){
     changePassHitbox.setFillColor({98,115,255});
 
     // change password button object
-    Button* changePassButton = new Button(changePassText);
+    auto* changePassButton = new Button(changePassText);
     changePassButton->setHitbox(changePassHitbox);
 
     // load into map for easy access
@@ -265,7 +265,7 @@ void Application::loadItems(){
     newUserText.setPosition(600, 342);
 
     // create text box for entering new username
-    TextBox* newUserBox = new TextBox(newUserText, "Username");
+    auto* newUserBox = new TextBox(newUserText, "Username");
     newUserBox->setPosition(600, 340);
     textBoxes["MyAccount"]["NewUsername"] = newUserBox;    // load into map for easy access
 
@@ -283,7 +283,7 @@ void Application::loadItems(){
     changeUserHitbox.setFillColor({98,115,255});
 
     // change username button object
-    Button* changeUserButton = new Button(changeUserText);
+    auto* changeUserButton = new Button(changeUserText);
     changeUserButton->setHitbox(changeUserHitbox);
 
     // load into map for easy access
@@ -303,7 +303,7 @@ void Application::loadItems(){
     createListingHitbox.setFillColor({98,115,255});
 
     // create listing button object
-    Button* createListingButton = new Button(createListingText);
+    auto* createListingButton = new Button(createListingText);
     createListingButton->setHitbox(createListingHitbox);
 
     // load into map for easy access
@@ -323,7 +323,7 @@ void Application::loadItems(){
     confirmListingHitbox.setFillColor({98,115,255});
 
     // confirming listing button object
-    Button* confirmListingButton = new Button(confirmListingText);
+    auto* confirmListingButton = new Button(confirmListingText);
     confirmListingButton->setHitbox(confirmListingHitbox);
 
     // load into map for easy access
@@ -337,7 +337,7 @@ void Application::loadItems(){
     listingNameText.setPosition(35, 282);
 
     // create text box for entering listing name
-    TextBox* listingNameBox = new TextBox(listingNameText, "Name", 389);
+    auto* listingNameBox = new TextBox(listingNameText, "Name", 389);
     listingNameBox->setPosition(35, 280);
     textBoxes["CreateListing"]["ListingName"] = listingNameBox;    // load into map for easy access
 
@@ -349,7 +349,7 @@ void Application::loadItems(){
     listingPriceText.setPosition(525, 282);
 
     // create text box for entering listing price
-    TextBox* listingPriceBox = new TextBox(listingPriceText, "Price", 70);
+    auto* listingPriceBox = new TextBox(listingPriceText, "Price", 70);
     listingPriceBox->setPosition(525, 280);
     textBoxes["CreateListing"]["ListingPrice"] = listingPriceBox;    // load into map for easy access
 
@@ -361,16 +361,16 @@ void Application::loadItems(){
     listingDescriptionText.setPosition(35, 342);
 
     // create text box for entering listing description
-    TextBox* listingDescriptionBox = new TextBox(listingDescriptionText, "Description", 980);
+    auto* listingDescriptionBox = new TextBox(listingDescriptionText, "Description", 980);
     listingDescriptionBox->setPosition(35, 340);
     textBoxes["CreateListing"]["ListingDescription"] = listingDescriptionBox;    // load into map for easy access
 }
 
 void Application::interpretKey(sf::Keyboard::Key keyCode){
     if(keyCode == 57){
-        for(auto iter: textBoxes["CreateListing"]) {
-            if (iter.second->selected){
-                iter.second->addChar(' ');
+        for (auto& [key, box] : textBoxes["CreateListing"]) {
+            if (box->selected) {
+                box->addChar(' ');
             }
         }
     }
@@ -380,17 +380,17 @@ void Application::interpretKey(sf::Keyboard::Key keyCode){
         // if user is pressing shift
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
             // add alternate character to selected text box
-            for(auto iter: textBoxes[applicationState]) {
-                if (iter.second->selected){
-                    iter.second->addChar(characters[keyCode + 36]);
+            for (auto& [key, box] : textBoxes[applicationState]) {
+                if (box->selected) {
+                    box->addChar(characters[keyCode + 36]);
                 }
             }
         }
         else{
             // add character to selected text box
-            for(auto iter: textBoxes[applicationState]) {
-                if(iter.second->selected){
-                    iter.second->addChar(characters[keyCode]);
+            for (auto& [key, box] : textBoxes[applicationState]) {
+                if (box->selected) {
+                    box->addChar(characters[keyCode]);
                 }
             }
         }
@@ -400,17 +400,17 @@ void Application::interpretKey(sf::Keyboard::Key keyCode){
         // if user is pressing shift
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
             // add alternate character to selected textbox
-            for (auto iter: textBoxes[applicationState]){
-                if(iter.second->selected){
-                    iter.second->addChar(characters[keyCode + 37]);
+            for (auto& [key, box] : textBoxes[applicationState]) {
+                if (box->selected) {
+                    box->addChar(characters[keyCode + 37]);
                 }
             }
         }
         else{
             // add character to selected text box
-            for(auto iter: textBoxes[applicationState]){
-                if(iter.second->selected){
-                    iter.second->addChar(characters[keyCode + 26]);
+            for (auto& [key, box] : textBoxes[applicationState]) {
+                if (box->selected) {
+                    box->addChar(characters[keyCode + 26]);
                 }
             }
         }
@@ -418,9 +418,9 @@ void Application::interpretKey(sf::Keyboard::Key keyCode){
     // if the user pressed backspace
     else if(sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace)){
         // delete the last character from selected text box
-        for(auto iter : textBoxes[applicationState]){
-            if(iter.second->selected && iter.second->getText().size() > 0){
-                iter.second->backspace();
+        for (auto& [key, box] : textBoxes[applicationState]) {
+            if (box->selected && box->getText().size() > 0) {
+                box->backspace();
             }
         }
     }
@@ -453,8 +453,8 @@ void Application::loadListings(){
         listings[document["OwnerID"].get_utf8().value.to_string()].push_back(listing);
     }
 
-    for(auto user : listings){
-        Eatery eatery(user.second[0].ownerName, user.second[0].ownerID, headerFont);
+    for (auto& [key, users] : listings) {
+        Eatery eatery(users[0].ownerName, users[0].ownerID, headerFont);
         eateries.push_back(eatery);
     }
 }
@@ -522,13 +522,13 @@ void Application::renderCreateListingWindow(){
     window->draw(headerText);
 
     // draw the buttons and text boxes on render window
-    for(auto iter : buttons["CreateListing"]){
-        window->draw(iter.second->getHitbox());
-        window->draw(iter.second->getRenderText());
+    for (auto& [key, button] : buttons["CreateListing"]) {
+        window->draw(button->getHitbox());
+        window->draw(button->getRenderText());
     }
-    for(auto iter : textBoxes["CreateListing"]){
-        window->draw(iter.second->getRect());
-        window->draw(iter.second->getRenderText());
+    for (auto& [key, textBox] : textBoxes["CreateListing"]) {
+        window->draw(textBox->getRect());
+        window->draw(textBox->getRenderText());
     }
 
     // render window
@@ -578,8 +578,8 @@ void Application::changeUsername(){
 
             currentUser = textBoxes["MyAccount"]["NewUsername"]->getText();
 
-            for(auto iter : textBoxes["MyAccount"]){
-                iter.second->reset();
+            for (auto& [key, textBox] : textBoxes["MyAccount"]) {
+                textBox->reset();
             }
         }
     }
@@ -618,8 +618,8 @@ void Application::changePassword(){
 
                     collection.update_one(getDoc.view(), modifyDoc.view());
 
-                    for(auto iter : textBoxes["MyAccount"]){
-                        iter.second->reset();
+                    for (auto& [key, textBox] : textBoxes["MyAccount"]) {
+                        textBox->reset();
                     }
                 }
                 else{
@@ -662,13 +662,13 @@ void Application::renderMyAccountWindow(){
     window->draw(headerText);
 
     // draw the buttons and text boxes on render window
-    for(auto iter : buttons["MyAccount"]){
-        window->draw(iter.second->getHitbox());
-        window->draw(iter.second->getRenderText());
+    for (auto& [key, button] : buttons["MyAccount"]) {
+        window->draw(button->getHitbox());
+        window->draw(button->getRenderText());
     }
-    for(auto iter : textBoxes["MyAccount"]){
-        window->draw(iter.second->getRect());
-        window->draw(iter.second->getRenderText());
+    for (auto& [key, textBox] : textBoxes["MyAccount"]) {
+        window->draw(textBox->getRect());
+        window->draw(textBox->getRenderText());
     }
 
     sf::Text currentPass;
@@ -788,13 +788,13 @@ void Application::renderSelectEateryWindow(){
     window->draw(headerText);
 
     // draw the buttons and text boxes on render window
-    for(auto iter : buttons["Ordering"]){
-        window->draw(iter.second->getHitbox());
-        window->draw(iter.second->getRenderText());
+    for (auto& [key, button] : buttons["Ordering"]) {
+        window->draw(button->getHitbox());
+        window->draw(button->getRenderText());
     }
-    for(auto iter : textBoxes["Ordering"]){
-        window->draw(iter.second->getRect());
-        window->draw(iter.second->getRenderText());
+    for (auto& [key, textBox] : textBoxes["Ordering"]) {
+        window->draw(textBox->getRect());
+        window->draw(textBox->getRenderText());
     }
 
     float column = 0;
@@ -926,13 +926,13 @@ void Application::renderCreateAccWindow(){
     window->clear({223, 226, 255});
 
     // draw the buttons and text boxes on render window
-    for(auto iter : buttons["CreateAccount"]){
-        window->draw(iter.second->getHitbox());
-        window->draw(iter.second->getRenderText());
+    for (auto& [key, button] : buttons["CreateAccount"]) {
+        window->draw(button->getHitbox());
+        window->draw(button->getRenderText());
     }
-    for(auto iter : textBoxes["CreateAccount"]){
-        window->draw(iter.second->getRect());
-        window->draw(iter.second->getRenderText());
+    for (auto& [key, textBox] : textBoxes["CreateAccount"]) {
+        window->draw(textBox->getRect());
+        window->draw(textBox->getRenderText());
     }
 
     sf::Text createUsername;
@@ -999,10 +999,11 @@ void Application::verifyLogin(const std::string& username, const std::string& pa
                     bsoncxx::document::view getUser = resultUserSearch->view();
                     std::string passResult = getUser["Password"].get_utf8().value.to_string();
                     // login success
-                    if(passResult == password){
-                        for(auto iter : textBoxes["Login"]){
-                            iter.second->reset();
+                    if (passResult == password) {
+                        for (auto& [key, textBox] : textBoxes["Login"]) {
+                            textBox->reset();
                         }
+                    }
                         userID = getUser["_id"].get_oid().value.to_string();
                         currentUser = username;
                         applicationState = "Ordering";
@@ -1055,13 +1056,13 @@ void Application::renderLoginWindow(){
     // draw header text, buttons and text boxes
     window->draw(header);
 
-    for(auto iter : buttons["Login"]){
-        window->draw(iter.second->getHitbox());
-        window->draw(iter.second->getRenderText());
+    for (auto& [key, button] : buttons["Login"]) {
+        window->draw(button->getHitbox());
+        window->draw(button->getRenderText());
     }
-    for(auto iter : textBoxes["Login"]){
-        window->draw(iter.second->getRect());
-        window->draw(iter.second->getRenderText());
+    for (auto& [key, textBox] : textBoxes["Login"]) {
+        window->draw(textBox->getRect());
+        window->draw(textBox->getRenderText());
     }
 
     window->draw(username);
@@ -1388,23 +1389,23 @@ Application::Application(){
 /*------------------------------------------------------------------------*/
 /*----------------------------Button Functions----------------------------*/
 /*------------------------------------------------------------------------*/
-sf::Text Button::getRenderText(){
+sf::Text Button::getRenderText() const {
     return buttonRenderText;
 }
 
-void Button::setHitbox(sf::RectangleShape inputHitbox){
+void Button::setHitbox(const sf::RectangleShape& inputHitbox) {
     hitBox = inputHitbox;
 }
 
-sf::RectangleShape Button::getHitbox(){
+sf::RectangleShape Button::getHitbox() const {
     return hitBox;
 }
 
-std::string Button::getText(){
+std::string Button::getText() const {
     return buttonText;
 }
 
-Button::Button(sf::Text inputText){
+Button::Button(const sf::Text& inputText) {
     buttonRenderText = inputText;
     buttonText = inputText.getString();
 }
@@ -1461,7 +1462,7 @@ void TextBox::setColor(sf::Color color){
     hitbox.setFillColor(color);
 }
 
-sf::RectangleShape TextBox::getRect(){
+sf::RectangleShape TextBox::getRect() const {
     return hitbox;
 }
 
@@ -1491,11 +1492,11 @@ void TextBox::addChar(char character){
     }
 }
 
-std::string TextBox::getText(){
+std::string TextBox::getText() const {
     return boxText;
 }
 
-sf::Text TextBox::getRenderText(){
+sf::Text TextBox::getRenderText() const {
     return boxRenderText;
 }
 
@@ -1521,7 +1522,7 @@ void TextBox::reset(){
     hitbox.setFillColor(sf::Color::White);
 }
 
-std::string TextBox::getType(){
+std::string TextBox::getType() const {
     return type;
 }
 
