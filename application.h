@@ -28,7 +28,7 @@ public:
     sf::RectangleShape getHitbox();
 
     // constructor
-    Button(sf::Text inputText);
+    explicit Button(sf::Text inputText);
 };
 
 struct Listing{
