@@ -54,6 +54,8 @@ struct Eatery{
     sf::Text renderName;
     sf::RectangleShape background;
 
+    void moveBackground(float x, float y);
+
     Eatery(const std::string& name, const std::string& userID, sf::Font& textFont);
 };
 

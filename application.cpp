@@ -800,7 +800,8 @@ void Application::renderSelectEateryWindow(){
     float column = 0;
     float row = 0;
     for(auto eatery : eateries){
-        eatery.background.setPosition({20 + (column * 220), 70 + (row * 220)});
+        //eatery.background.setPosition({20 + (column * 220), 70 + (row * 220)});
+        eatery.moveBackground(20 + (column * 220), 70 + (row * 220));
         eatery.renderName.setPosition({119 + (column * 220), 82 + (row * 220)});
 
         eatery.background.setOutlineThickness(2);
@@ -1091,7 +1092,6 @@ void Application::renderLoginWindow(){
 /*------------------------------------------------------------------------*/
 /*------------------------Main Application Driver-------------------------*/
 /*------------------------------------------------------------------------*/
-
 void Application::run(){
     float mouseX;
     float mouseY;
@@ -1107,15 +1107,15 @@ void Application::run(){
                 mouseX = sf::Mouse::getPosition(*window).x;
                 mouseY = sf::Mouse::getPosition(*window).y;
 
-                if(applicationState == "Login") {
-                    for(auto textBox: textBoxes[applicationState]) {
-                        if(textBox.second->getRect().getGlobalBounds().contains(mouseX, mouseY)) {
+                if(applicationState == "Login"){
+                    for(auto& [key, textBox] : textBoxes[applicationState]) {
+                        if(textBox->getRect().getGlobalBounds().contains(mouseX, mouseY)) {
                             for (auto iter2: textBoxes[applicationState]) {
                                 iter2.second->selected = false;
                                 iter2.second->setColor(sf::Color::White);
                             }
-                            textBox.second->selected = true;
-                            textBox.second->setColor({240, 240, 255});
+                            textBox->selected = true;
+                            textBox->setColor({240, 240, 255});
 
                             loginErr = 0;
                         }
@@ -1136,14 +1136,14 @@ void Application::run(){
                     }
                 }
                 else if(applicationState == "CreateAccount"){
-                    for(auto textBox: textBoxes[applicationState]) {
-                        if (textBox.second->getRect().getGlobalBounds().contains(mouseX, mouseY)) {
+                    for(auto& [key, textBox] : textBoxes[applicationState]) {
+                        if (textBox->getRect().getGlobalBounds().contains(mouseX, mouseY)) {
                             for (auto iter2: textBoxes[applicationState]) {
                                 iter2.second->selected = false;
                                 iter2.second->setColor(sf::Color::White);
                             }
-                            textBox.second->selected = true;
-                            textBox.second->setColor({240, 240, 255});
+                            textBox->selected = true;
+                            textBox->setColor({240, 240, 255});
 
                             accountErr = 0;
                         }
@@ -1194,26 +1194,26 @@ void Application::run(){
                     }
                 }
                 else if(applicationState == "MyAccount"){
-                    for(auto textBox: textBoxes[applicationState]) {
-                        if (textBox.second->getRect().getGlobalBounds().contains(mouseX, mouseY)) {
-                            for (auto iter2: textBoxes[applicationState]) {
-                                iter2.second->selected = false;
-                                iter2.second->setColor(sf::Color::White);
+                    for(auto& [key, textBox] : textBoxes[applicationState]) {
+                        if(textBox->getRect().getGlobalBounds().contains(mouseX, mouseY)) {
+                            for (auto& [key, innerTextBox] : textBoxes[applicationState]) {
+                                innerTextBox->selected = false;
+                                innerTextBox->setColor(sf::Color::White);
                             }
-                            textBox.second->selected = true;
-                            textBox.second->setColor({240, 240, 255});
+                            textBox->selected = true;
+                            textBox->setColor({240, 240, 255});
 
                             newPassErr = 0;
                             newUserErr = 0;
 
-                            if (textBox.second->getType() == "Password") {
+                            if (textBox->getType() == "Password") {
                                 for (auto iter: textBoxes["MyAccount"]) {
                                     if (iter.second->getType() == "Username") {
                                         iter.second->reset();
                                     }
                                 }
                             }
-                            else if (textBox.second->getType() == "Username") {
+                            else if (textBox->getType() == "Username") {
                                 for (auto iter: textBoxes["MyAccount"]) {
                                     if (iter.second->getType() == "Password") {
                                         iter.second->reset();
@@ -1254,14 +1254,14 @@ void Application::run(){
                     }
                 }
                 else if(applicationState == "CreateListing"){
-                    for (auto textBox: textBoxes[applicationState]) {
-                        if (textBox.second->getRect().getGlobalBounds().contains(mouseX, mouseY)) {
-                            for (auto iter2: textBoxes[applicationState]) {
-                                iter2.second->selected = false;
-                                iter2.second->setColor(sf::Color::White);
+                    for (auto& [key, textBox] : textBoxes[applicationState]) {
+                        if (textBox->getRect().getGlobalBounds().contains(mouseX, mouseY)) {
+                            for (auto& [key, innerTextBox] : textBoxes[applicationState]) {
+                                innerTextBox->selected = false;
+                                innerTextBox->setColor(sf::Color::White);
                             }
-                            textBox.second->selected = true;
-                            textBox.second->setColor({240, 240, 255});
+                            textBox->selected = true;
+                            textBox->setColor({240, 240, 255});
                         }
                     }
                     for(auto button: buttons[applicationState]){
@@ -1325,8 +1325,8 @@ void Application::run(){
                         if (createListing(textBoxes["CreateListing"]["ListingName"]->getText(),
                                           textBoxes["CreateListing"]["ListingPrice"]->getText(),
                                           textBoxes["CreateListing"]["ListingDescription"]->getText())){
-                            for (auto textBox: textBoxes[applicationState]){
-                                textBox.second->reset();
+                            for (auto& [key, textBox] : textBoxes[applicationState]){
+                                textBox->reset();
                             }
                             applicationState = "Ordering";
                             loadListings();
@@ -1431,6 +1431,10 @@ Listing::Listing(const std::string& name, const std::string& price, const std::s
     renderName.setOrigin({renderName.getGlobalBounds().getSize().x / 2, renderName.getGlobalBounds().getSize().y / 2});
 }
 
+void Eatery::moveBackground(float x, float y){
+    this->background.setPosition({x, y});
+}
+
 Eatery::Eatery(const std::string& name, const std::string& userID, sf::Font& textFont){
     this->name = name;
     this->userID = userID;
@@ -1444,6 +1448,7 @@ Eatery::Eatery(const std::string& name, const std::string& userID, sf::Font& tex
     renderName.setCharacterSize(12);
     renderName.setOrigin({renderName.getGlobalBounds().getSize().x / 2, renderName.getGlobalBounds().getSize().y / 2});
 }
+
 
 /*------------------------------------------------------------------------*/
 /*---------------------------TextBox Functions----------------------------*/
