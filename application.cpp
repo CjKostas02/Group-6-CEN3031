@@ -999,11 +999,10 @@ void Application::verifyLogin(const std::string& username, const std::string& pa
                     bsoncxx::document::view getUser = resultUserSearch->view();
                     std::string passResult = getUser["Password"].get_utf8().value.to_string();
                     // login success
-                    if (passResult == password) {
-                        for (auto& [key, textBox] : textBoxes["Login"]) {
-                            textBox->reset();
+                    if(passResult == password){
+                        for(auto iter : textBoxes["Login"]){
+                            iter.second->reset();
                         }
-                    }
                         userID = getUser["_id"].get_oid().value.to_string();
                         currentUser = username;
                         applicationState = "Ordering";

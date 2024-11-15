@@ -20,15 +20,15 @@ private:
 
 public:
     // setter function prototypes
-    void setHitbox(sf::RectangleShape inputHitbox);
+    void setHitbox(const sf::RectangleShape& inputHitbox);
 
     // getter function prototypes
-    std::string getText();
-    sf::Text getRenderText();
-    sf::RectangleShape getHitbox();
+    std::string getText() const;
+    sf::Text getRenderText() const;
+    sf::RectangleShape getHitbox() const;
 
     // constructor
-    explicit Button(sf::Text inputText);
+    explicit Button(const sf::Text& inputText);
 };
 
 struct Listing{
@@ -79,10 +79,10 @@ public:
     void setPosition(float x, float y);
 
     // getter function prototypes
-    std::string getText();
-    std::string getType();
-    sf::Text getRenderText();
-    sf::RectangleShape getRect();
+    std::string getText() const;
+    std::string getType() const;
+    sf::Text getRenderText() const;
+    sf::RectangleShape getRect() const;
 
     // constructor
     TextBox(sf::Text& inputRenderText, const std::string& type, const float& width = 250);
