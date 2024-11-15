@@ -158,6 +158,8 @@ void Application::loadItems(){
     backButton->setHitbox(backHitbox);
     buttons["MyAccount"]["Back"] = backButton;
     buttons["CreateListing"]["Back"] = backButton;
+    buttons["SelectListing"]["Back"] = backButton;
+
 
     // text object for my-account button
     sf::Text viewAccText;
@@ -764,7 +766,7 @@ void Application::renderMyAccountWindow(){
 /*------------------------------------------------------------------------*/
 /*----------------------Ordering Window Functionality---------------------*/
 /*------------------------------------------------------------------------*/
-void Application::renderOrderWindow(){
+void Application::renderSelectEateryWindow(){
     // TODO: Add comments
 
     // header text
@@ -806,6 +808,62 @@ void Application::renderOrderWindow(){
 
         window->draw(eatery.background);
         window->draw(eatery.renderName);
+
+        if(column < 3){
+            column++;
+        }
+        else{
+            row++;
+            column = 0;
+        }
+    }
+
+    // render window
+    window->display();
+}
+
+void Application::renderSelectListingWindow(){
+    // TODO: Add comments
+
+    // header text
+    sf::Text headerText;
+    headerText.setFont(headerFont);
+    headerText.setFillColor({98, 115, 255});
+    headerText.setString("Select your order");
+    headerText.setPosition(2, 0);
+    headerText.setCharacterSize(40);
+
+    // set window background color
+    window->clear({223, 226, 255});
+
+    sf::RectangleShape windowHeader(sf::Vector2f(1050 , 50));
+    windowHeader.setPosition(0,0);
+    windowHeader.setFillColor({200, 200, 255});
+
+    window->draw(windowHeader);
+    window->draw(headerText);
+
+    // draw the buttons and text boxes on render window
+    for(auto iter : buttons["SelectListing"]){
+        window->draw(iter.second->getHitbox());
+        window->draw(iter.second->getRenderText());
+    }
+    for(auto iter : textBoxes["SelectListing"]){
+        window->draw(iter.second->getRect());
+        window->draw(iter.second->getRenderText());
+    }
+
+    float column = 0;
+    float row = 0;
+    for(auto listing : listings[selectedEatery]){
+        listing.background.setPosition({20 + (column * 220), 95 + (row * 220)});
+        listing.renderName.setPosition({119 + (column * 220), 107 + (row * 220)});
+
+        listing.background.setOutlineThickness(2);
+        listing.background.setOutlineColor(sf::Color::Black);
+
+        window->draw(listing.background);
+        window->draw(listing.renderName);
 
         if(column < 3){
             column++;
@@ -1041,176 +1099,241 @@ void Application::run(){
 
     while(window->isOpen()){
         sf::Event event;
-        while(window->pollEvent(event)){
-            if(event.type == sf::Event::Closed){
+        while(window->pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
                 window->close();
                 return;
             }
-            if(event.type == sf::Event::MouseButtonReleased){
+            if(event.type == sf::Event::MouseButtonReleased) {
                 mouseX = sf::Mouse::getPosition(*window).x;
                 mouseY = sf::Mouse::getPosition(*window).y;
 
-                for (auto& [key, textBox] : textBoxes[applicationState]) {
-                    if (textBox->getRect().getGlobalBounds().contains(mouseX, mouseY)) {
-                        for (auto& [innerKey, iter2] : textBoxes[applicationState]) {
-                            iter2->selected = false;
-                            iter2->setColor(sf::Color::White);
-                        }
-                        textBox->selected = true;
-                        textBox->setColor({240, 240, 255});
-
-                        loginErr = 0;
-                        accountErr = 0;
-                        newUserErr = 0;
-                        newPassErr = 0;
-
-                        if (applicationState == "MyAccount") {
-                            if (textBox->getType() == "Password") {
-                                for (auto& [innerKey, iter] : textBoxes["MyAccount"]) {
-                                    if (iter->getType() == "Username") {
-                                        iter->reset();
-                                    }
-                                }
-                            } else if (textBox->getType() == "Username") {
-                                for (auto& [innerKey, iter] : textBoxes["MyAccount"]) {
-                                    if (iter->getType() == "Password") {
-                                        iter->reset();
-                                    }
-                                }
+                if(applicationState == "Login"){
+                    for(auto& [key, textBox] : textBoxes[applicationState]) {
+                        if(textBox->getRect().getGlobalBounds().contains(mouseX, mouseY)) {
+                            for (auto iter2: textBoxes[applicationState]) {
+                                iter2.second->selected = false;
+                                iter2.second->setColor(sf::Color::White);
                             }
+                            textBox->selected = true;
+                            textBox->setColor({240, 240, 255});
+
+                            loginErr = 0;
                         }
                     }
-                    else if (textBox.second->getText() == "Create Account" &&
-         createAccount(textBoxes["CreateAccount"]["CreateUser"]->getText(),
-                       textBoxes["CreateAccount"]["CreatePass"]->getText())) {
-                        for (auto& [key, iter] : textBoxes["CreateAccount"]) {
-                            iter->reset();
-                        }
-
-                        applicationState = "Login";
-                        return;
-                       }
-
-                }
-                for(auto button : buttons[applicationState]){
-                    if(button.second->getHitbox().getGlobalBounds().contains(mouseX, mouseY)){
-                        if(button.second->getText() == "Create Account"){
-                            if(applicationState == "Login"){
-                                for (auto& [key, textBox] : textBoxes[applicationState]) {
-                                    textBox->reset();
+                    for(auto button: buttons[applicationState]) {
+                        if (button.second->getHitbox().getGlobalBounds().contains(mouseX, mouseY)) {
+                            if (button.second->getText() == "Log In") {
+                                verifyLogin(textBoxes["Login"]["Username"]->getText(),
+                                            textBoxes["Login"]["Password"]->getText());
+                            } else if (button.second->getText() == "Create Account") {
+                                for (auto textBox: textBoxes[applicationState]) {
+                                    textBox.second->reset();
                                 }
                                 loginErr = 0;
                                 applicationState = "CreateAccount";
                             }
-                            else if (applicationState == "CreateAccount" &&
-         createAccount(textBoxes["CreateAccount"]["CreateUser"]->getText(),
-                       textBoxes["CreateAccount"]["CreatePass"]->getText())) {
-                                for (auto& [key, textBox] : textBoxes["CreateAccount"]) {
-                                    textBox->reset();
-                                }
-
-                                applicationState = "Login";
-                       }
-
                         }
-                        else if(button.second->getText() == "Back"){
-                            for (auto& [key, textBox] : textBoxes[applicationState]) {
-                                textBox->reset();
+                    }
+                }
+                else if(applicationState == "CreateAccount"){
+                    for(auto& [key, textBox] : textBoxes[applicationState]) {
+                        if (textBox->getRect().getGlobalBounds().contains(mouseX, mouseY)) {
+                            for (auto iter2: textBoxes[applicationState]) {
+                                iter2.second->selected = false;
+                                iter2.second->setColor(sf::Color::White);
                             }
+                            textBox->selected = true;
+                            textBox->setColor({240, 240, 255});
 
-                            if(applicationState == "CreateAccount"){
+                            accountErr = 0;
+                        }
+                    }
+                    for(auto button: buttons[applicationState]){
+                        if(button.second->getHitbox().getGlobalBounds().contains(mouseX, mouseY)){
+                            if(button.second->getText() == "Create Account") {
+                                if(createAccount(textBoxes["CreateAccount"]["CreateUser"]->getText(),
+                                                  textBoxes["CreateAccount"]["CreatePass"]->getText())){
+                                    for(auto textBox: textBoxes["CreateAccount"]){
+                                        textBox.second->reset();
+                                    }
+
+                                    applicationState = "Login";
+                                }
+                            }
+                            if(button.second->getText() == "Back") {
+                                for (auto textBox: textBoxes[applicationState]) {
+                                    textBox.second->reset();
+                                }
                                 applicationState = "Login";
                                 accountErr = 0;
                             }
-                            else if(applicationState == "MyAccount"){
+                        }
+                    }
+                }
+                else if(applicationState == "Ordering"){
+                    for(auto button: buttons[applicationState]) {
+                        if (button.second->getHitbox().getGlobalBounds().contains(mouseX, mouseY)) {
+                            if(button.second->getText() == "Log Out") {
+                                currentUser = "";
+                                userID = "";
+                                applicationState = "Login";
+                            }
+                            else if(button.second->getText() == "My Account"){
+                                applicationState = "MyAccount";
+                            }
+                            else if(button.second->getText() == "+"){
+                                applicationState = "CreateListing";
+                            }
+                        }
+                    }
+                    for(Eatery eatery: eateries){
+                        if(eatery.background.getGlobalBounds().contains(mouseX, mouseY)){
+                            selectedEatery = eatery.userID;
+                            applicationState = "SelectListing";
+                        }
+                    }
+                }
+                else if(applicationState == "MyAccount"){
+                    for(auto& [key, textBox] : textBoxes[applicationState]) {
+                        if(textBox->getRect().getGlobalBounds().contains(mouseX, mouseY)) {
+                            for (auto& [key, innerTextBox] : textBoxes[applicationState]) {
+                                innerTextBox->selected = false;
+                                innerTextBox->setColor(sf::Color::White);
+                            }
+                            textBox->selected = true;
+                            textBox->setColor({240, 240, 255});
+
+                            newPassErr = 0;
+                            newUserErr = 0;
+
+                            if (textBox->getType() == "Password") {
+                                for (auto iter: textBoxes["MyAccount"]) {
+                                    if (iter.second->getType() == "Username") {
+                                        iter.second->reset();
+                                    }
+                                }
+                            }
+                            else if (textBox->getType() == "Username") {
+                                for (auto iter: textBoxes["MyAccount"]) {
+                                    if (iter.second->getType() == "Password") {
+                                        iter.second->reset();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    for(auto button: buttons[applicationState]) {
+                        if(button.second->getHitbox().getGlobalBounds().contains(mouseX, mouseY)){
+                            if(button.second->getText() == "Back") {
+                                for(auto textBox: textBoxes[applicationState]){
+                                    textBox.second->reset();
+                                }
                                 newUserErr = 0;
                                 newPassErr = 0;
                                 applicationState = "Ordering";
                             }
-                            else if(applicationState == "CreateListing"){
+                            else if(button.second->getText() == "Change Password"){
+                                newUserErr = 0;
+                                for(auto textBox: textBoxes[applicationState]){
+                                    if(textBox.second->getType() == "Username"){
+                                        textBox.second->reset();
+                                    }
+                                }
+                                changePassword();
+                            }
+                            else if(button.second->getText() == "Change Username"){
+                                for(auto textBox: textBoxes[applicationState]){
+                                    if(textBox.second->getType() == "Password"){
+                                        textBox.second->reset();
+                                    }
+                                }
+                                newPassErr = 0;
+                                changeUsername();
+                            }
+                        }
+                    }
+                }
+                else if(applicationState == "CreateListing"){
+                    for (auto& [key, textBox] : textBoxes[applicationState]) {
+                        if (textBox->getRect().getGlobalBounds().contains(mouseX, mouseY)) {
+                            for (auto& [key, innerTextBox] : textBoxes[applicationState]) {
+                                innerTextBox->selected = false;
+                                innerTextBox->setColor(sf::Color::White);
+                            }
+                            textBox->selected = true;
+                            textBox->setColor({240, 240, 255});
+                        }
+                    }
+                    for(auto button: buttons[applicationState]){
+                        if(button.second->getHitbox().getGlobalBounds().contains(mouseX, mouseY)){
+                            if(button.second->getText() == "Back") {
+                                for (auto textBox: textBoxes[applicationState]) {
+                                    textBox.second->reset();
+                                }
+                                applicationState = "Ordering";
+                            }
+                            else if(button.second->getText() == "Create Listing"){
+                                if(createListing(textBoxes["CreateListing"]["ListingName"]->getText(),
+                                                 textBoxes["CreateListing"]["ListingPrice"]->getText(),
+                                                 textBoxes["CreateListing"]["ListingDescription"]->getText())){
+                                    for(auto textBox: textBoxes[applicationState]){
+                                        textBox.second->reset();
+                                    }
+                                    applicationState = "Ordering";
+                                    loadListings();
+                                }
+                            }
+                        }
+                    }
+                }
+                else if(applicationState == "SelectListing"){
+                    for(auto button: buttons[applicationState]) {
+                        if (button.second->getHitbox().getGlobalBounds().contains(mouseX, mouseY)) {
+                            if (button.second->getText() == "Back") {
                                 applicationState = "Ordering";
                             }
                         }
-                        else if(button.second->getText() == "Log Out"){
-                            currentUser = "";
-                            userID = "";
-                            applicationState = "Login";
-                        }
-                        else if(button.second->getText() == "My Account"){
-                            applicationState = "MyAccount";
-                        }
-                        else if(button.second->getText() == "+"){
-                            applicationState = "CreateListing";
-                        }
-                        else if(button.second->getText() == "Log In"){
-                            verifyLogin(textBoxes["Login"]["Username"]->getText(), textBoxes["Login"]["Password"]->getText());
-                        }
-                        else if(button.second->getText() == "Change Password"){
-                            newUserErr = 0;
-                            for (auto& [key, textBox] : textBoxes[applicationState]) {
-                                if (textBox->getType() == "Username") {
-                                    textBox->reset();
-                                }
-                            }
-                            changePassword();
-                        }
-                        else if(button.second->getText() == "Change Username"){
-                            for (auto& [key, textBox] : textBoxes[applicationState]) {
-                                if (textBox->getType() == "Password") {
-                                    textBox->reset();
-                                }
-                            }
-                            newPassErr = 0;
-                            changeUsername();
-                        }
-                        else if (button.second->getText() == "Create Listing" &&
-         createListing(textBoxes["CreateListing"]["ListingName"]->getText(),textBoxes["CreateListing"]["ListingPrice"]->getText(),
-                       textBoxes["CreateListing"]["ListingDescription"]->getText())) {
-                            for (auto& [key, textBox] : textBoxes[applicationState]) {
-                                textBox->reset();
-                            }
-                            applicationState = "Ordering";
-                            loadListings();
-                       }
                     }
                 }
             }
-
             else if(event.type == sf::Event::KeyPressed){
                 if(event.key.code == sf::Keyboard::Key::Enter){
                     if(applicationState == "Login"){
-                        verifyLogin(textBoxes["Login"]["Username"]->getText(), textBoxes["Login"]["Password"]->getText());
+                        verifyLogin(textBoxes["Login"]["Username"]->getText(),
+                                    textBoxes["Login"]["Password"]->getText());
                     }
                     else if(applicationState == "CreateAccount"){
                         if(createAccount(textBoxes["CreateAccount"]["CreateUser"]->getText(),
-                                         textBoxes["CreateAccount"]["CreatePass"]->getText())){
-                            for (auto& [key, iter] : textBoxes["CreateAccount"]) {
-                                iter->reset();
+                                          textBoxes["CreateAccount"]["CreatePass"]->getText())){
+                            for(auto iter: textBoxes["CreateAccount"]){
+                                iter.second->reset();
                             }
                             applicationState = "Login";
                         }
                     }
                     else if(applicationState == "MyAccount"){
-                        for (auto& [key, textBox] : textBoxes["MyAccount"]) {
-                            if (textBox->selected && textBox->getType() == "Password") {
+                        for(auto textBox: textBoxes["MyAccount"]){
+                            if (textBox.second->selected && textBox.second->getType() == "Password"){
                                 changePassword();
-                            } else if (textBox->selected && textBox->getType() == "Username") {
+                            }
+                            else if(textBox.second->selected && textBox.second->getType() == "Username"){
                                 changeUsername();
                             }
                         }
-
                     }
-                    else if (applicationState == "CreateListing" &&
-         createListing(textBoxes["CreateListing"]["ListingName"]->getText(),textBoxes["CreateListing"]["ListingPrice"]->getText(),
-                       textBoxes["CreateListing"]["ListingDescription"]->getText())) {
-                        for (auto& [key, textBox] : textBoxes[applicationState]) {
-                            textBox->reset();
+                    else if (applicationState == "CreateListing") {
+                        if (createListing(textBoxes["CreateListing"]["ListingName"]->getText(),
+                                          textBoxes["CreateListing"]["ListingPrice"]->getText(),
+                                          textBoxes["CreateListing"]["ListingDescription"]->getText())){
+                            for (auto& [key, textBox] : textBoxes[applicationState]){
+                                textBox->reset();
+                            }
+                            applicationState = "Ordering";
+                            loadListings();
                         }
-                        applicationState = "Ordering";
-                        loadListings();
-                       }
+                    }
                 }
-
                 else{
                     accountErr = 0;
                     loginErr = 0;
@@ -1225,13 +1348,16 @@ void Application::run(){
                 renderCreateAccWindow();
             }
             else if(applicationState == "Ordering"){
-                renderOrderWindow();
+                renderSelectEateryWindow();
             }
             else if(applicationState == "MyAccount"){
                 renderMyAccountWindow();
             }
             else if(applicationState == "CreateListing"){
                 renderCreateListingWindow();
+            }
+            else if(applicationState == "SelectListing"){
+                renderSelectListingWindow();
             }
         }
     }
@@ -1296,9 +1422,14 @@ Listing::Listing(const std::string& name, const std::string& price, const std::s
     this->ownerName = ownerName;
     this->description = description;
 
-
     background.setFillColor(sf::Color::White);
     background.setSize({200,200});
+
+    renderName.setString(name);
+    renderName.setFont(textFont);
+    renderName.setFillColor(sf::Color::Black);
+    renderName.setCharacterSize(12);
+    renderName.setOrigin({renderName.getGlobalBounds().getSize().x / 2, renderName.getGlobalBounds().getSize().y / 2});
 }
 
 Eatery::Eatery(const std::string& name, const std::string& userID, sf::Font& textFont){
