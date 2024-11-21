@@ -52,9 +52,7 @@ struct Eatery{
     std::string name;
     std::string userID;
     sf::Text renderName;
-    sf::RectangleShape background;
-
-    void moveBackground(float x, float y);
+    sf::RectangleShape* background;
 
     Eatery(const std::string& name, const std::string& userID, sf::Font& textFont);
 };
@@ -99,6 +97,9 @@ private:
     int accountErr;
     int newPassErr;
     int newUserErr;
+    int eateryPage;
+    int listingPage;
+
     std::string userID;
     std::string currentUser;
     sf::RenderWindow* window;

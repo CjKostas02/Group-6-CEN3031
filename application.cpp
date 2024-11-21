@@ -364,6 +364,46 @@ void Application::loadItems(){
     auto* listingDescriptionBox = new TextBox(listingDescriptionText, "Description", 980);
     listingDescriptionBox->setPosition(35, 340);
     textBoxes["CreateListing"]["ListingDescription"] = listingDescriptionBox;    // load into map for easy access
+
+    // text object for next page button
+    sf::Text nextPageText;
+    nextPageText.setFont(textFont);
+    nextPageText.setFillColor({223, 226, 255});
+    nextPageText.setCharacterSize(20);
+    nextPageText.setString("Next >");
+    nextPageText.setPosition(222, 550);
+
+    // next page button clickable area
+    sf::RectangleShape nextPageHitbox({102,28});
+    nextPageHitbox.setPosition(200,550);
+    nextPageHitbox.setFillColor({98,115,255});
+
+    // next page button object
+    auto* nextPageButton = new Button(nextPageText);
+    nextPageButton->setHitbox(nextPageHitbox);
+
+    // load into map for easy access
+    buttons["SelectListing"]["NextPage"] = nextPageButton;
+
+    // text object for previous page button
+    sf::Text previousPageText;
+    previousPageText.setFont(textFont);
+    previousPageText.setFillColor({223, 226, 255});
+    previousPageText.setCharacterSize(20);
+    previousPageText.setString("< Previous");
+    previousPageText.setPosition(52, 550);
+
+    // previous page button clickable area
+    sf::RectangleShape previousPageHitbox({102,28});
+    previousPageHitbox.setPosition(50,550);
+    previousPageHitbox.setFillColor({98,115,255});
+
+    // previous page button object
+    auto* previousPageButton = new Button(previousPageText);
+    previousPageButton->setHitbox(previousPageHitbox);
+
+    // load into map for easy access
+    buttons["SelectListing"]["PreviousPage"] = previousPageButton;
 }
 
 void Application::interpretKey(sf::Keyboard::Key keyCode){
@@ -799,23 +839,48 @@ void Application::renderSelectEateryWindow(){
 
     float column = 0;
     float row = 0;
+
     for(auto eatery : eateries){
-        //eatery.background.setPosition({20 + (column * 220), 70 + (row * 220)});
-        eatery.moveBackground(20 + (column * 220), 70 + (row * 220));
-        eatery.renderName.setPosition({119 + (column * 220), 82 + (row * 220)});
+        if(eatery.userID == userID) {
+            eatery.background->setPosition({20 + (column * 220), 70 + (row * 220)});
+            //eatery.moveBackground(20 + (column * 220), 70 + (row * 220));
+            eatery.renderName.setPosition({119 + (column * 220), 82 + (row * 220)});
 
-        eatery.background.setOutlineThickness(2);
-        eatery.background.setOutlineColor(sf::Color::Black);
+            eatery.background->setOutlineThickness(2);
+            eatery.background->setOutlineColor(sf::Color::Black);
 
-        window->draw(eatery.background);
-        window->draw(eatery.renderName);
+            window->draw(*(eatery.background));
+            window->draw(eatery.renderName);
 
-        if(column < 3){
-            column++;
+            if (column < 3) {
+                column++;
+            } else {
+                row++;
+                column = 0;
+            }
+            break;
         }
-        else{
-            row++;
-            column = 0;
+    }
+
+    for(auto eatery : eateries){
+        if(eatery.userID != userID){
+            eatery.background->setPosition({20 + (column * 220), 70 + (row * 220)});
+            //eatery.moveBackground(20 + (column * 220), 70 + (row * 220));
+            eatery.renderName.setPosition({119 + (column * 220), 82 + (row * 220)});
+
+            eatery.background->setOutlineThickness(2);
+            eatery.background->setOutlineColor(sf::Color::Black);
+
+            window->draw(*(eatery.background));
+            window->draw(eatery.renderName);
+
+            if(column < 3){
+                column++;
+            }
+            else{
+                row++;
+                column = 0;
+            }
         }
     }
 
@@ -856,7 +921,30 @@ void Application::renderSelectListingWindow(){
 
     float column = 0;
     float row = 0;
-    for(auto listing : listings[selectedEatery]){
+
+    for(int i = 8 * listingPage; i < listings[selectedEatery].size(); i++){
+        if(row < 2){
+            listings[selectedEatery][i].background.setPosition({20 + (column * 270), 95 + (row * 220)});
+            listings[selectedEatery][i].renderName.setPosition({119 + (column * 270), 107 + (row * 220)});
+
+            listings[selectedEatery][i].background.setOutlineThickness(2);
+            listings[selectedEatery][i].background.setOutlineColor(sf::Color::Black);
+
+            window->draw(listings[selectedEatery][i].background);
+            window->draw(listings[selectedEatery][i].renderName);
+
+            if(column < 3){
+                column++;
+            }
+            else{
+                row++;
+                column = 0;
+            }
+        }
+    }
+
+
+    /*for(auto listing : listings[selectedEatery]){
         listing.background.setPosition({20 + (column * 220), 95 + (row * 220)});
         listing.renderName.setPosition({119 + (column * 220), 107 + (row * 220)});
 
@@ -873,7 +961,7 @@ void Application::renderSelectListingWindow(){
             row++;
             column = 0;
         }
-    }
+    }*/
 
     // render window
     window->display();
@@ -1187,7 +1275,7 @@ void Application::run(){
                         }
                     }
                     for(Eatery eatery: eateries){
-                        if(eatery.background.getGlobalBounds().contains(mouseX, mouseY)){
+                        if(eatery.background->getGlobalBounds().contains(mouseX, mouseY)){
                             selectedEatery = eatery.userID;
                             applicationState = "SelectListing";
                         }
@@ -1289,9 +1377,25 @@ void Application::run(){
                 else if(applicationState == "SelectListing"){
                     for(auto button: buttons[applicationState]) {
                         if (button.second->getHitbox().getGlobalBounds().contains(mouseX, mouseY)) {
-                            if (button.second->getText() == "Back") {
+                            if(button.second->getText() == "Back"){
+                                listingPage = 0;
                                 applicationState = "Ordering";
                             }
+                            else if(button.second->getText() == "Next >"){
+                                if(8 * (listingPage + 1) < listings[selectedEatery].size()){
+                                    listingPage++;
+                                }
+                            }
+                            else if(button.second->getText() == "< Previous"){
+                                if(listingPage > 0){
+                                    listingPage--;
+                                }
+                            }
+                        }
+                    }
+                    for(Listing listing : listings[selectedEatery]){
+                        if(listing.background.getGlobalBounds().contains(mouseX, mouseY)){
+                            std::cout << listing.name << std::endl;
                         }
                     }
                 }
@@ -1375,6 +1479,8 @@ Application::Application(){
     accountErr = 0;
     newPassErr = 0;
     newUserErr = 0;
+    eateryPage = 0;
+    listingPage = 0;
 
     // Create an instance.
     uri = mongocxx::uri{"mongodb+srv://default_user:defaultPassword@group6ccf.ka8iy.mongodb.net/?retryWrites=true&w=majority&appName=Group6CCF"};
@@ -1431,16 +1537,14 @@ Listing::Listing(const std::string& name, const std::string& price, const std::s
     renderName.setOrigin({renderName.getGlobalBounds().getSize().x / 2, renderName.getGlobalBounds().getSize().y / 2});
 }
 
-void Eatery::moveBackground(float x, float y){
-    this->background.setPosition({x, y});
-}
-
 Eatery::Eatery(const std::string& name, const std::string& userID, sf::Font& textFont){
     this->name = name;
     this->userID = userID;
 
-    background.setFillColor(sf::Color::White);
-    background.setSize({200,200});
+    background = new sf::RectangleShape;
+
+    background->setFillColor(sf::Color::White);
+    background->setSize({200,200});
 
     renderName.setString(name);
     renderName.setFont(textFont);
