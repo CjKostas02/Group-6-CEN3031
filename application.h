@@ -1,6 +1,8 @@
 #pragma once
 #include <map>
 #include <vector>
+#include <sstream>
+#include <iostream>
 #include <SFML/Graphics.hpp>
 #include <bsoncxx/json.hpp>
 #include <mongocxx/client.hpp>
@@ -39,7 +41,9 @@ struct Listing{
     std::string description;
     sf::Text renderName;
     std::vector<Button> buttons;
-    sf::RectangleShape background;
+    sf::RectangleShape* background;
+    sf::RectangleShape shadow;
+
 
     Listing(const std::string& name, const std::string& price,
             const std::string& description,
@@ -112,8 +116,8 @@ private:
     std::map<std::string, std::map<std::string, TextBox*>> textBoxes;
 
 public:
-    mongocxx::uri uri;
-    mongocxx::client conn;
+    mongocxx::uri* uri;
+    mongocxx::client* conn;
     mongocxx::instance inst{};
 
     // function prototypes

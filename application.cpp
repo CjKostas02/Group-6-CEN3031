@@ -1,5 +1,3 @@
-#include <sstream>
-#include <iostream>
 #include "application.h"
 
 
@@ -470,7 +468,7 @@ void Application::loadListings(){
     listings = {};
     eateries = {};
 
-    auto database = conn["user_data"];
+    auto database = (*conn)["user_data"];
     auto userCollection = database["users"];
     auto listingCollection = database["listings"];
 
@@ -503,7 +501,7 @@ void Application::loadListings(){
 /*-------------------Create Listing Window Functionality------------------*/
 /*------------------------------------------------------------------------*/
 bool Application::createListing(const std::string& name, const std::string& price, const std::string& description){
-    auto database = conn["user_data"];
+    auto database = (*conn)["user_data"];
     auto collection = database["listings"];
 
     bsoncxx::builder::basic::document document{};
@@ -592,7 +590,7 @@ void Application::changeUsername(){
         return;
     }
     else{
-        auto database = conn["user_data"];
+        auto database = (*conn)["user_data"];
         auto collection = database["users"];
 
         auto resultUserSearch = collection.find_one(
@@ -628,7 +626,7 @@ void Application::changeUsername(){
 void Application::changePassword(){
     // TODO: Add comments
 
-    auto database = conn["user_data"];
+    auto database = (*conn)["user_data"];
     auto collection= database["users"];
 
     auto resultUserSearch = collection.find_one(
@@ -922,18 +920,22 @@ void Application::renderSelectListingWindow(){
     float column = 0;
     float row = 0;
 
-    for(int i = 8 * listingPage; i < listings[selectedEatery].size(); i++){
+    for(Listing listing : listings[selectedEatery]){
+        listing.background->setPosition({5000, 5000});
+    }
+
+    for(int i = 6 * listingPage; i < listings[selectedEatery].size(); i++){
         if(row < 2){
-            listings[selectedEatery][i].background.setPosition({20 + (column * 270), 95 + (row * 220)});
-            listings[selectedEatery][i].renderName.setPosition({119 + (column * 270), 107 + (row * 220)});
+            listings[selectedEatery][i].background->setPosition({20 + (column * 345), 95 + (row * 220)});
+            listings[selectedEatery][i].shadow.setPosition({25 + (column * 345), 100 + (row * 220)});
+            listings[selectedEatery][i].renderName.setPosition({177 + (column * 345), 107 + (row * 220)});
+            listings[selectedEatery][i].background->setOutlineColor(sf::Color::Black);
 
-            listings[selectedEatery][i].background.setOutlineThickness(2);
-            listings[selectedEatery][i].background.setOutlineColor(sf::Color::Black);
-
-            window->draw(listings[selectedEatery][i].background);
+            window->draw(listings[selectedEatery][i].shadow);
+            window->draw(*listings[selectedEatery][i].background);
             window->draw(listings[selectedEatery][i].renderName);
 
-            if(column < 3){
+            if(column < 2){
                 column++;
             }
             else{
@@ -975,7 +977,7 @@ bool Application::createAccount(const std::string& username, const std::string& 
     // TODO: Add comments
 
     if(username.size() > 0 && password.size() > 0){
-        auto database = conn["user_data"];
+        auto database = (*conn)["user_data"];
         auto collection = database["users"];
 
         auto resultUserSearch = collection.find_one(
@@ -1070,7 +1072,7 @@ void Application::verifyLogin(const std::string& username, const std::string& pa
     // TODO: Add comments
 
     if(username.size() > 0 && password.size() > 0){
-        auto database = conn["user_data"];
+        auto database = (*conn)["user_data"];
         auto collection= database["users"];
 
         auto resultUserSearch = collection.find_one(
@@ -1394,7 +1396,7 @@ void Application::run(){
                         }
                     }
                     for(Listing listing : listings[selectedEatery]){
-                        if(listing.background.getGlobalBounds().contains(mouseX, mouseY)){
+                        if(listing.background->getGlobalBounds().contains(mouseX, mouseY)){
                             std::cout << listing.name << std::endl;
                         }
                     }
@@ -1483,8 +1485,8 @@ Application::Application(){
     listingPage = 0;
 
     // Create an instance.
-    uri = mongocxx::uri{"mongodb+srv://default_user:defaultPassword@group6ccf.ka8iy.mongodb.net/?retryWrites=true&w=majority&appName=Group6CCF"};
-    conn = mongocxx::client{uri};
+    uri = new mongocxx::uri{"mongodb+srv://default_user:defaultPassword@group6ccf.ka8iy.mongodb.net/?retryWrites=true&w=majority&appName=Group6CCF"};
+    conn = new mongocxx::client{*uri};
 
     // load all items into the program
     loadItems();
@@ -1527,8 +1529,12 @@ Listing::Listing(const std::string& name, const std::string& price, const std::s
     this->ownerName = ownerName;
     this->description = description;
 
-    background.setFillColor(sf::Color::White);
-    background.setSize({200,200});
+    background = new sf::RectangleShape({315,200});
+    background->setFillColor(sf::Color::White);
+    background->setOutlineThickness(1);
+
+    shadow.setSize({315,200});
+    shadow.setFillColor({203, 206, 235});
 
     renderName.setString(name);
     renderName.setFont(textFont);
