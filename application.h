@@ -15,7 +15,7 @@
 
 class Button{
 private:
-    // variables
+    // member variables
     std::string buttonText;
     sf::RectangleShape hitBox;
     sf::Text buttonRenderText;
@@ -34,17 +34,21 @@ public:
 };
 
 struct Listing{
+    // member variables
     std::string name;
     std::string price;
+    sf::Text renderName;
     std::string ownerID;
     std::string ownerName;
     std::string description;
-    sf::Text renderName;
+    sf::RectangleShape shadow;
     std::vector<Button> buttons;
     sf::RectangleShape* background;
-    sf::RectangleShape shadow;
 
+    // default constructor
+    Listing();
 
+    // parameterized constructor
     Listing(const std::string& name, const std::string& price,
             const std::string& description,
             const std::string& ownerID,
@@ -53,17 +57,19 @@ struct Listing{
 };
 
 struct Eatery{
+    // member variables
     std::string name;
     std::string userID;
     sf::Text renderName;
     sf::RectangleShape* background;
 
+    // constructor
     Eatery(const std::string& name, const std::string& userID, sf::Font& textFont);
 };
 
 class TextBox{
 private:
-    // variables
+    // member variables
     std::string type;
     std::string boxText;
     sf::Text boxRenderText;
@@ -90,13 +96,13 @@ public:
     TextBox(sf::Text& inputRenderText, const std::string& type, const float& width = 250);
 };
 
-
 class Application {
 private:
     // fonts
     sf::Font textFont;
     sf::Font headerFont;
 
+    // member variables
     int loginErr;
     int accountErr;
     int newPassErr;
@@ -104,18 +110,30 @@ private:
     int eateryPage;
     int listingPage;
 
+    /* Application states
+     * Login: log in functionality
+     * CreateAccount: Create account functionality
+     * Ordering: Eatery selection window functionality
+     * MyAccount: Account credential modification functionality
+     * SelectListing: Listing selection screen functionality
+     * CreateListing: Listing creation functionality
+     * ViewListing: Listing details functionality */
+    std::string applicationState;
+
+    // member variables
     std::string userID;
     std::string currentUser;
     sf::RenderWindow* window;
     std::string selectedEatery;
+    Listing selectedListing;
     std::vector<char> characters;
-    std::string applicationState;
     std::vector<Eatery> eateries;
     std::map<std::string, std::vector<Listing>> listings;
     std::map<std::string, std::map<std::string, Button*>> buttons;
     std::map<std::string, std::map<std::string, TextBox*>> textBoxes;
 
 public:
+    // MongoDB class variables
     mongocxx::uri* uri;
     mongocxx::client* conn;
     mongocxx::instance inst{};
@@ -135,6 +153,7 @@ public:
     void renderLoginWindow();
     void renderMyAccountWindow();
     void renderCreateAccWindow();
+    void renderViewListingWindow();
     void renderSelectEateryWindow();
     void renderSelectListingWindow();
     void renderCreateListingWindow();
