@@ -17,12 +17,12 @@ class Button{
 private:
     // member variables
     std::string buttonText;
-    sf::RectangleShape hitBox;
+    sf::RectangleShape* hitBox;
     sf::Text buttonRenderText;
 
 public:
     // setter function prototypes
-    void setHitbox(const sf::RectangleShape& inputHitbox);
+    void setHitbox(sf::RectangleShape* inputHitbox);
 
     // getter function prototypes
     std::string getText() const;
@@ -38,6 +38,7 @@ struct Listing{
     std::string name;
     std::string price;
     sf::Text renderName;
+    sf::Text renderPrice;
     std::string ownerID;
     std::string ownerName;
     std::string description;
@@ -61,6 +62,7 @@ struct Eatery{
     std::string name;
     std::string userID;
     sf::Text renderName;
+    sf::RectangleShape shadow;
     sf::RectangleShape* background;
 
     // constructor

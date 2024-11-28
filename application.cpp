@@ -2,11 +2,9 @@
 
 
 void Application::loadItems(){
-    // TODO: Organize by section
-
     loadListings();
 
-    // load fonts from folder
+    // load Open Sans font: https://fonts.google.com/specimen/Open+Sans
     headerFont.loadFromFile("../fonts/Open_Sans/static/OpenSans-ExtraBold.ttf");
     textFont.loadFromFile("../fonts/Open_Sans/static/OpenSans-Regular.ttf");
 
@@ -76,9 +74,9 @@ void Application::loadItems(){
     createAccText.setPosition(465, 555);
 
     // create account button clickable area
-    sf::RectangleShape createAccHitbox({120,20});
-    createAccHitbox.setPosition(465,555);
-    createAccHitbox.setFillColor({223, 226, 255});
+    sf::RectangleShape* createAccHitbox = new sf::RectangleShape({120,20});
+    createAccHitbox->setPosition(465,555);
+    createAccHitbox->setFillColor({223, 226, 255});
 
     // create account button object
     auto* createAccButton = new Button(createAccText);
@@ -96,9 +94,9 @@ void Application::loadItems(){
     loginText.setPosition(495, 500);
 
     // log in button clickable area
-    sf::RectangleShape loginHitbox({250,28});
-    loginHitbox.setPosition(400,500);
-    loginHitbox.setFillColor({98,115,255});
+    sf::RectangleShape* loginHitbox = new sf::RectangleShape({250,28});
+    loginHitbox->setPosition(400,500);
+    loginHitbox->setFillColor({98,115,255});
 
     // log in button object
     auto* loginButton = new Button(loginText);
@@ -116,9 +114,9 @@ void Application::loadItems(){
     completeCreateText.setPosition(455, 500);
 
     // create account button clickable area
-    sf::RectangleShape completeCreateHitbox({250,28});
-    completeCreateHitbox.setPosition(400,500);
-    completeCreateHitbox.setFillColor({98,115,255});
+    sf::RectangleShape* completeCreateHitbox = new sf::RectangleShape({250,28});
+    completeCreateHitbox->setPosition(400,500);
+    completeCreateHitbox->setFillColor({98,115,255});
 
     // create account button object
     auto* confirmCreateButton = new Button(completeCreateText);
@@ -133,12 +131,12 @@ void Application::loadItems(){
     backText.setFillColor({98, 115, 255});
     backText.setCharacterSize(20);
     backText.setString("Back");
-    backText.setPosition(20, 20);
+    backText.setPosition(20, 60);
 
     // clickable area for back-button
-    sf::RectangleShape backHitbox({45,25});
-    backHitbox.setPosition(20,20);
-    backHitbox.setFillColor({223, 226, 255});
+    sf::RectangleShape* backHitbox = new sf::RectangleShape({45,25});
+    backHitbox->setPosition(20,60);
+    backHitbox->setFillColor({223, 226, 255});
 
     // button object for back-button
     auto* backButton = new Button(backText);
@@ -146,14 +144,6 @@ void Application::loadItems(){
 
     // add back button to map of buttons for easy access
     buttons["CreateAccount"]["Back"] = backButton;
-
-    // modify back button for other screens
-    backText.setPosition(20, 60);
-    backHitbox.setPosition(20,60);
-    backButton = new Button(backText);
-    backButton->setHitbox(backHitbox);
-
-    // add modified back button to other windows
     buttons["MyAccount"]["Back"] = backButton;
     buttons["CreateListing"]["Back"] = backButton;
     buttons["SelectListing"]["Back"] = backButton;
@@ -168,9 +158,9 @@ void Application::loadItems(){
     viewAccText.setPosition(900, 0);
 
     // my account button clickable area
-    sf::RectangleShape viewAccHitbox({110,25});
-    viewAccHitbox.setPosition(900,0);
-    viewAccHitbox.setFillColor({200, 200, 255});
+    sf::RectangleShape* viewAccHitbox = new sf::RectangleShape({110,25});
+    viewAccHitbox->setPosition(900,0);
+    viewAccHitbox->setFillColor({200, 200, 255});
 
     // my account button object
     auto* viewAccButton = new Button(viewAccText);
@@ -188,9 +178,9 @@ void Application::loadItems(){
     logoutText.setPosition(925, 28);
 
     // log out button clickable area
-    sf::RectangleShape logoutHitbox({55,20});
-    logoutHitbox.setPosition(925,28);
-    logoutHitbox.setFillColor({200, 200, 255});
+    sf::RectangleShape* logoutHitbox = new sf::RectangleShape({55,20});
+    logoutHitbox->setPosition(925,28);
+    logoutHitbox->setFillColor({200, 200, 255});
 
     // log out button object
     auto* logoutButton = new Button(logoutText);
@@ -198,6 +188,25 @@ void Application::loadItems(){
 
     // add log out button to map of buttons for easy access
     buttons["Ordering"]["Logout"] = logoutButton;
+
+
+    // text for purchase button
+    sf::Text purchaseText;
+    purchaseText.setFont(textFont);
+    purchaseText.setString("Purchase");
+    purchaseText.setFillColor({223, 226, 255});
+    purchaseText.setCharacterSize(20);
+    purchaseText.setPosition(20, 490);
+
+    auto* purchaseButton = new Button(purchaseText);
+
+    // purchase button hitbox
+    sf::RectangleShape* purchaseHitbox = new sf::RectangleShape({90,28});
+    purchaseHitbox->setPosition(20, 490);
+    purchaseHitbox->setFillColor({98,115,255});
+    purchaseButton->setHitbox(purchaseHitbox);
+
+    buttons["ViewListing"]["Purchase"] = purchaseButton;
 
     // text object for current password textbox
     sf::Text currentPassText;
@@ -244,9 +253,9 @@ void Application::loadItems(){
     changePassText.setPosition(240, 500);
 
     // change password button clickable area
-    sf::RectangleShape changePassHitbox({250,28});
-    changePassHitbox.setPosition(200,500);
-    changePassHitbox.setFillColor({98,115,255});
+    sf::RectangleShape* changePassHitbox = new sf::RectangleShape({250,28});
+    changePassHitbox->setPosition(200,500);
+    changePassHitbox->setFillColor({98,115,255});
 
     // change password button object
     auto* changePassButton = new Button(changePassText);
@@ -276,9 +285,9 @@ void Application::loadItems(){
     changeUserText.setPosition(640, 500);
 
     // change username button clickable area
-    sf::RectangleShape changeUserHitbox({250,28});
-    changeUserHitbox.setPosition(600,500);
-    changeUserHitbox.setFillColor({98,115,255});
+    sf::RectangleShape* changeUserHitbox = new sf::RectangleShape({250,28});
+    changeUserHitbox->setPosition(600,500);
+    changeUserHitbox->setFillColor({98,115,255});
 
     // change username button object
     auto* changeUserButton = new Button(changeUserText);
@@ -293,12 +302,12 @@ void Application::loadItems(){
     createListingText.setFillColor({223, 226, 255});
     createListingText.setCharacterSize(30);
     createListingText.setString("+");
-    createListingText.setPosition(989, 528);
+    createListingText.setPosition(959, 428);
 
     // create listing button clickable area
-    sf::RectangleShape createListingHitbox({35,35});
-    createListingHitbox.setPosition(980,530);
-    createListingHitbox.setFillColor({98,115,255});
+    sf::RectangleShape* createListingHitbox = new sf::RectangleShape({35,35});
+    createListingHitbox->setPosition(950,430);
+    createListingHitbox->setFillColor({98,115,255});
 
     // create listing button object
     auto* createListingButton = new Button(createListingText);
@@ -316,9 +325,9 @@ void Application::loadItems(){
     confirmListingText.setPosition(820, 530);
 
     // confirming listing button clickable area
-    sf::RectangleShape confirmListingHitbox({250,28});
-    confirmListingHitbox.setPosition(760,530);
-    confirmListingHitbox.setFillColor({98,115,255});
+    sf::RectangleShape* confirmListingHitbox = new sf::RectangleShape({250,28});
+    confirmListingHitbox->setPosition(760,530);
+    confirmListingHitbox->setFillColor({98,115,255});
 
     // confirming listing button object
     auto* confirmListingButton = new Button(confirmListingText);
@@ -372,9 +381,9 @@ void Application::loadItems(){
     nextPageText.setPosition(918, 550);
 
     // next page button clickable area
-    sf::RectangleShape nextPageHitbox({102,28});
-    nextPageHitbox.setPosition(898,550);
-    nextPageHitbox.setFillColor({98,115,255});
+    sf::RectangleShape* nextPageHitbox = new sf::RectangleShape({102,28});
+    nextPageHitbox->setPosition(898,550);
+    nextPageHitbox->setFillColor({98,115,255});
 
     // next page button object
     auto* nextPageButton = new Button(nextPageText);
@@ -382,6 +391,7 @@ void Application::loadItems(){
 
     // load into map for easy access
     buttons["SelectListing"]["NextPage"] = nextPageButton;
+    buttons["Ordering"]["NextPage"] = nextPageButton;
 
     // text object for previous page button
     sf::Text previousPageText;
@@ -392,9 +402,9 @@ void Application::loadItems(){
     previousPageText.setPosition(52, 550);
 
     // previous page button clickable area
-    sf::RectangleShape previousPageHitbox({102,28});
-    previousPageHitbox.setPosition(50,550);
-    previousPageHitbox.setFillColor({98,115,255});
+    sf::RectangleShape* previousPageHitbox = new sf::RectangleShape({102,28});
+    previousPageHitbox->setPosition(50,550);
+    previousPageHitbox->setFillColor({98,115,255});
 
     // previous page button object
     auto* previousPageButton = new Button(previousPageText);
@@ -402,6 +412,27 @@ void Application::loadItems(){
 
     // load into map for easy access
     buttons["SelectListing"]["PreviousPage"] = previousPageButton;
+    buttons["Ordering"]["PreviousPage"] = previousPageButton;
+
+    // text object for refresh button
+    sf::Text refreshText;
+    refreshText.setFont(textFont);
+    refreshText.setFillColor({98,115,255});
+    refreshText.setCharacterSize(20);
+    refreshText.setString("Refresh");
+    refreshText.setPosition(922, 70);
+
+    // refresh button clickable area
+    sf::RectangleShape* refreshHitbox = new sf::RectangleShape({72,28});
+    refreshHitbox->setFillColor({223, 226, 255});
+    refreshHitbox->setPosition(920,70);
+
+    // refresh button object
+    auto* refreshButton = new Button(refreshText);
+    refreshButton->setHitbox(refreshHitbox);
+
+    // load into map for easy access
+    buttons["Ordering"]["Refresh"] = refreshButton;
 }
 
 void Application::interpretKey(sf::Keyboard::Key keyCode){
@@ -505,6 +536,7 @@ void Application::loadListings(){
     }
 }
 
+
 /*------------------------------------------------------------------------*/
 /*-------------------Create Listing Window Functionality------------------*/
 /*------------------------------------------------------------------------*/
@@ -593,68 +625,71 @@ void Application::renderCreateListingWindow(){
 /*---------------------My Account Window Functionality--------------------*/
 /*------------------------------------------------------------------------*/
 void Application::changeUsername(){
-    // TODO: Change format of changeUsername
-    //  and changePassword to be similar to createAccount
-    //  and verifyLogin to reduce map traversals
+    // get new username from textbox
+    std::string newUsername = textBoxes["MyAccount"]["NewUsername"]->getText();
 
     // if the user attempts to change username to current username
-    if(textBoxes["MyAccount"]["NewUsername"]->getText() == currentUser){
+    if(newUsername == currentUser){
         // throw error
         newUserErr = 2;
         return;
     }
     // if the user attempts to change username to an invalid value
-    else if(textBoxes["MyAccount"]["NewUsername"]->getText().size() == 0){
+    if(newUsername.size() == 0){
         // throw error
         newUserErr = 3;
         return;
     }
-    else{
-        // initialize MongoDB database and collection
-        auto database = (*conn)["user_data"];
-        auto collection = database["users"];
 
-        // determine username availability
-        auto resultUserSearch = collection.find_one(
-                bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(
-                        "Username", textBoxes["MyAccount"]["NewUsername"]->getText())));
+    // initialize MongoDB database and collection
+    auto database = (*conn)["user_data"];
+    auto collection = database["users"];
 
-        // if desired username is already taken
-        if(resultUserSearch){
-            // throw error
-            newUserErr = 1;
-        }
-        else{
-            // success message
-            newUserErr = 4;
+    // determine username availability
+    auto resultUserSearch = collection.find_one(
+            bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(
+                    "Username", newUsername)));
 
-            // get current user object to modify
-            bsoncxx::builder::stream::document getDoc;
-            getDoc << "Username" << currentUser;
-
-            // create modified user object
-            bsoncxx::builder::stream::document modifyDoc;
-
-            // set new credentials
-            modifyDoc << "$set" << bsoncxx::builder::stream::open_document
-                      << "Username" << textBoxes["MyAccount"]["NewUsername"]->getText()
-                      << bsoncxx::builder::stream::close_document;
-
-            // update the database
-            collection.update_one(getDoc.view(), modifyDoc.view());
-
-            // update the class member variable to reflect changes
-            currentUser = textBoxes["MyAccount"]["NewUsername"]->getText();
-
-            // clear textboxes
-            for (auto& [key, textBox] : textBoxes["MyAccount"]) {
-                textBox->reset();
-            }
-        }
+    // if desired username is already taken
+    if(resultUserSearch){
+        // throw error
+        newUserErr = 1;
     }
+    else{
+        // success message
+        newUserErr = 4;
+
+        // get current user object to modify
+        bsoncxx::builder::stream::document getDoc;
+        getDoc << "Username" << currentUser;
+
+        // create modified user object
+        bsoncxx::builder::stream::document modifyDoc;
+
+        // set new credentials
+        modifyDoc << "$set" << bsoncxx::builder::stream::open_document
+                  << "Username" << newUsername
+                  << bsoncxx::builder::stream::close_document;
+
+        // update the database
+        collection.update_one(getDoc.view(), modifyDoc.view());
+
+        // update the class member variable to reflect changes
+        currentUser = newUsername;
+
+        // clear textboxes
+        for (auto& [key, textBox] : textBoxes["MyAccount"]) {
+            textBox->reset();
+        }
+
+        loadListings();
+    }
+
 }
 
 void Application::changePassword(){
+
+
     // initialize MongoDB database and collection
     auto database = (*conn)["user_data"];
     auto collection= database["users"];
@@ -872,9 +907,25 @@ void Application::renderSelectEateryWindow(){
     window->draw(headerText);
 
     // draw the buttons and text boxes on render window
-    for (auto& [key, button] : buttons["Ordering"]) {
-        window->draw(button->getHitbox());
-        window->draw(button->getRenderText());
+    for(auto& [key, button] : buttons["Ordering"]){
+        // if user has scrolled to another page of eateries, display the "Previous" button
+        if(button->getText() == "< Previous"){
+            if(eateryPage > 0){
+                window->draw(button->getHitbox());
+                window->draw(button->getRenderText());
+            }
+        }
+        // if there are multiple pages of eateries, draw "Next" button
+        else if(button->getText() == "Next >"){
+            if(8 * (eateryPage + 1) < eateries.size()){
+                window->draw(button->getHitbox());
+                window->draw(button->getRenderText());
+            }
+        }
+        else{
+            window->draw(button->getHitbox());
+            window->draw(button->getRenderText());
+        }
     }
     for (auto& [key, textBox] : textBoxes["Ordering"]) {
         window->draw(textBox->getRect());
@@ -885,44 +936,57 @@ void Application::renderSelectEateryWindow(){
     float column = 0;
     float row = 0;
 
-    // search for current user in eateries
-    for(auto eatery : eateries){
-        // if current user has created listings, display current user card first
-        if(eatery.userID == userID) {
-            // render eatery in top left position
-            eatery.background->setPosition({20, 70});
-            eatery.renderName.setPosition({119, 82});
+    // move un-rendered listings off the screen
+    for(Eatery eatery : eateries){
+        eatery.background->setPosition({5000, 5000});
+    }
 
-            // draw eatery text and background
-            window->draw(*(eatery.background));
-            window->draw(eatery.renderName);
+    if(eateryPage == 0){
+        // search for current user in eateries
+        for(auto eatery : eateries){
+            // if current user has created listings, display current user card first
+            if(eatery.userID == userID) {
+                // render eatery in top left position
+                eatery.background->setPosition({20, 70});
+                eatery.shadow.setPosition({25,75});
+                eatery.renderName.setPosition({119, 82});
 
-            // adjust column
-            column++;
-            break;
+                // draw eatery text and background
+                window->draw(eatery.shadow);
+                window->draw(*(eatery.background));
+                window->draw(eatery.renderName);
+
+                // adjust column
+                column++;
+                break;
+            }
         }
     }
 
     // read through eateries
-    for(auto eatery : eateries){
-        // ignore current user
-        if(eatery.userID != userID){
-            // move eatery card to position depending on rows and columns
-            eatery.background->setPosition({20 + (column * 220), 70 + (row * 220)});
-            eatery.renderName.setPosition({119 + (column * 220), 82 + (row * 220)});
+    for(int i = 8 * eateryPage; i < eateries.size(); i++){
+        if(row < 2){
+            // ignore current user
+            if(eateries[i].userID != userID){
+                // move eatery card to position depending on rows and columns
+                eateries[i].background->setPosition({20 + (column * 220), 70 + (row * 220)});
+                eateries[i].shadow.setPosition({25 + (column * 220), 75 + (row * 220)});
+                eateries[i].renderName.setPosition({119 + (column * 220), 82 + (row * 220)});
 
-            // draw the eatery text and background
-            window->draw(*(eatery.background));
-            window->draw(eatery.renderName);
+                // draw the eatery text and background
+                window->draw(eateries[i].shadow);
+                window->draw(*(eateries[i].background));
+                window->draw(eateries[i].renderName);
 
-            // adjust the rows and columns
-            if(column < 3){
-                column++;
-            }
-            else{
-                // if end of column reached, add a row
-                row++;
-                column = 0;
+                // adjust the rows and columns
+                if(column < 3){
+                    column++;
+                }
+                else{
+                    // if end of column reached, add a row
+                    row++;
+                    column = 0;
+                }
             }
         }
     }
@@ -995,13 +1059,16 @@ void Application::renderSelectListingWindow(){
             // render listing background, shadow and text according to row and column values
             listings[selectedEatery][i].background->setPosition({20 + (column * 345), 95 + (row * 220)});
             listings[selectedEatery][i].shadow.setPosition({25 + (column * 345), 100 + (row * 220)});
-            listings[selectedEatery][i].renderName.setPosition({177 + (column * 345), 107 + (row * 220)});
-            listings[selectedEatery][i].background->setOutlineColor(sf::Color::Black);
+            listings[selectedEatery][i].renderName.setPosition({177 + (column * 345), 157 + (row * 220)});
+            listings[selectedEatery][i].renderPrice.setPosition({177 + (column * 345), 177 + (row * 220)});
+
 
             // draw listing
             window->draw(listings[selectedEatery][i].shadow);
             window->draw(*listings[selectedEatery][i].background);
             window->draw(listings[selectedEatery][i].renderName);
+            window->draw(listings[selectedEatery][i].renderPrice);
+
 
             // adjust rows and columns
             if(column < 2){
@@ -1073,7 +1140,6 @@ void Application::renderViewListingWindow(){
         // temporary text object
         sf::Text tempText = descriptionText;
         tempText.setString(descriptionText.getString() + " " + value);
-
         // if the current word fits within the description boundaries
         if(tempText.getGlobalBounds().width < 500){
             // add word to the render text
@@ -1493,6 +1559,7 @@ void Application::run(){
                                 // clear account member variables
                                 currentUser = "";
                                 userID = "";
+                                eateryPage = 0;
 
                                 // set application state to Log In
                                 applicationState = "Login";
@@ -1506,6 +1573,28 @@ void Application::run(){
                             else if(button.second->getText() == "+"){
                                 // set application state to Create Listing
                                 applicationState = "CreateListing";
+                            }
+                            // if user clicked the Next button
+                            else if(button.second->getText() == "Next >"){
+                                // if user is not on the last page of eateries
+                                if(8 * (eateryPage + 1) < eateries.size()){
+                                    // go forward a page
+                                    eateryPage++;
+                                }
+                            }
+                            // if user clicks the Previous button
+                            else if(button.second->getText() == "< Previous"){
+                                // if user is not on the first page of eateries
+                                if(eateryPage > 0){
+                                    // go back a page
+                                    eateryPage--;
+                                }
+                            }
+                            // if user clicks refresh button
+                            else if(button.second->getText() == "Refresh"){
+                                // reload the listings and set page back to 0
+                                loadListings();
+                                eateryPage = 0;
                             }
                         }
                     }
@@ -1859,12 +1948,12 @@ sf::Text Button::getRenderText() const {
     return buttonRenderText;
 }
 
-void Button::setHitbox(const sf::RectangleShape& inputHitbox) {
+void Button::setHitbox(sf::RectangleShape* inputHitbox) {
     hitBox = inputHitbox;
 }
 
 sf::RectangleShape Button::getHitbox() const {
-    return hitBox;
+    return *hitBox;
 }
 
 std::string Button::getText() const {
@@ -1903,6 +1992,7 @@ Listing::Listing(const std::string& name, const std::string& price, const std::s
     background = new sf::RectangleShape({315,200});
     background->setFillColor(sf::Color::White);
     background->setOutlineThickness(1);
+    background->setOutlineColor(sf::Color::Black);
 
     // create shadow
     shadow.setSize({315,200});
@@ -1914,6 +2004,13 @@ Listing::Listing(const std::string& name, const std::string& price, const std::s
     renderName.setFillColor(sf::Color::Black);
     renderName.setCharacterSize(12);
     renderName.setOrigin({renderName.getGlobalBounds().getSize().x / 2, renderName.getGlobalBounds().getSize().y / 2});
+
+    // set price render text object
+    renderPrice.setString("$" + price);
+    renderPrice.setFont(textFont);
+    renderPrice.setFillColor(sf::Color::Black);
+    renderPrice.setCharacterSize(12);
+    renderPrice.setOrigin({renderPrice.getGlobalBounds().getSize().x / 2, renderPrice.getGlobalBounds().getSize().y / 2});
 }
 
 Eatery::Eatery(const std::string& name, const std::string& userID, sf::Font& textFont){
@@ -1924,8 +2021,12 @@ Eatery::Eatery(const std::string& name, const std::string& userID, sf::Font& tex
     // create background rectangle object
     background = new sf::RectangleShape({200,200});
     background->setFillColor(sf::Color::White);
-    background->setOutlineThickness(2);
+    background->setOutlineThickness(1);
     background->setOutlineColor(sf::Color::Black);
+
+    // create shadow
+    shadow.setSize({200,200});
+    shadow.setFillColor({203, 206, 235});
 
     // set name render text object
     renderName.setString(name);
