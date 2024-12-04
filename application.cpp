@@ -541,21 +541,27 @@ void Application::loadListings(){
 /*-------------------Create Listing Window Functionality------------------*/
 /*------------------------------------------------------------------------*/
 bool Application::createListing(const std::string& name, const std::string& price, const std::string& description){
-    // initialize MongoDB database and collection
-    auto database = (*conn)["user_data"];
-    auto collection = database["listings"];
+    if(name.length() == 0 || price.length() == 0 || description.length() == 0){
+        newListingErr = 1;
+    }
+    else{
+        // initialize MongoDB database and collection
+        auto database = (*conn)["user_data"];
+        auto collection = database["listings"];
 
-    // create listing entry
-    bsoncxx::builder::basic::document document{};
-    document.append(bsoncxx::builder::basic::kvp("Name", name));
-    document.append(bsoncxx::builder::basic::kvp("OwnerID", userID));
-    document.append(bsoncxx::builder::basic::kvp("Price", price));
-    document.append(bsoncxx::builder::basic::kvp("Description", description));
+        // create listing entry
+        bsoncxx::builder::basic::document document{};
+        document.append(bsoncxx::builder::basic::kvp("Name", name));
+        document.append(bsoncxx::builder::basic::kvp("OwnerID", userID));
+        document.append(bsoncxx::builder::basic::kvp("Price", price));
+        document.append(bsoncxx::builder::basic::kvp("Description", description));
 
-    // store listing in MongoDB collection
-    collection.insert_one(document.view());
+        // store listing in MongoDB collection
+        collection.insert_one(document.view());
 
-    return true;
+        return true;
+    }
+    return false;
 }
 
 void Application::renderCreateListingWindow(){
@@ -596,6 +602,18 @@ void Application::renderCreateListingWindow(){
     listingDescription.setPosition(35, 312);
     listingDescription.setCharacterSize(20);
 
+    // success/error message object for changing username
+    sf::Text listingErrorText;
+    listingErrorText.setFont(textFont);
+    listingErrorText.setCharacterSize(20);
+    listingErrorText.setFillColor(sf::Color::Red);
+    listingErrorText.setPosition(425, 150);
+
+    // set message depending on context
+    if(newListingErr == 1){
+        listingErrorText.setString("Please fill out each entry.");
+    }
+
     // set window background color
     window->clear({223, 226, 255});
 
@@ -605,6 +623,7 @@ void Application::renderCreateListingWindow(){
     window->draw(listingDescription);
     window->draw(windowHeader);
     window->draw(headerText);
+    window->draw(listingErrorText);
 
     // draw the buttons and text boxes on render window
     for (auto& [key, button] : buttons["CreateListing"]) {
@@ -688,8 +707,6 @@ void Application::changeUsername(){
 }
 
 void Application::changePassword(){
-
-
     // initialize MongoDB database and collection
     auto database = (*conn)["user_data"];
     auto collection= database["users"];
@@ -1709,6 +1726,9 @@ void Application::run(){
                             // set clicked textbot as selected, change color as visual cue
                             textBox->selected = true;
                             textBox->setColor({240, 240, 255});
+
+                            // reset message
+                            newListingErr = 0;
                         }
                     }
                     // if user clicked a button
@@ -1723,6 +1743,9 @@ void Application::run(){
 
                                 // change application state to Ordering
                                 applicationState = "Ordering";
+
+                                // reset message
+                                newListingErr = 0;
                             }
                             // if user clicked Create Listing
                             else if(button.second->getText() == "Create Listing"){
@@ -1885,6 +1908,7 @@ void Application::run(){
                     // clear messages
                     accountErr = 0;
                     loginErr = 0;
+                    newListingErr = 0;
 
                     // perform key operation
                     interpretKey(event.key.code);
@@ -1929,6 +1953,7 @@ Application::Application(){
     accountErr = 0;
     newPassErr = 0;
     newUserErr = 0;
+    newListingErr = 0;
     eateryPage = 0;
     listingPage = 0;
 

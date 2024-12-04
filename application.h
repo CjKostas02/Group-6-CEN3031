@@ -109,6 +109,7 @@ private:
     int accountErr;
     int newPassErr;
     int newUserErr;
+    int newListingErr;
     int eateryPage;
     int listingPage;
 
